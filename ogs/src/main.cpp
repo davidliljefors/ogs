@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <utility>
+#include <array>
 
 class GLContext
 {
@@ -12,12 +13,20 @@ public:
 	GLContext()
 	{
 		glfwInit();
-		_window = glfwCreateWindow(1280, 720, "ogs", NULL, NULL);
+		_window = glfwCreateWindow(800, 600, "ogs", NULL, NULL);
 
 		if (!_window)
 		{
 			glfwTerminate();
 			std::cerr << "GLFW : Create Window Error" << std::endl;
+			std::exit(-1);
+		}
+
+		glfwMakeContextCurrent(_window);
+
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+		{
+			std::cerr << "GLAD : Failed to initialize GLAD" << std::endl;
 			std::exit(-1);
 		}
 
@@ -31,6 +40,51 @@ public:
 			if (key == GLFW_KEY_ESCAPE)
 			{
 				glfwSetWindowShouldClose(window, GLFW_TRUE);
+			}
+
+			if (key == GLFW_KEY_ENTER && 
+				(mods & GLFW_MOD_ALT))
+			{
+				auto const maximized = glfwGetWindowAttrib(window, GLFW_MAXIMIZED);
+
+				if (maximized == GLFW_TRUE)
+				{
+					glfwRestoreWindow(window);
+				}
+				else
+				{
+					glfwMaximizeWindow(window);
+				}
+			}
+
+			auto GetWindowPos = [](auto window) {
+				int x, y;
+				glfwGetWindowPos(window, &x, &y);
+				return std::make_pair(x, y);
+			};
+
+			if (key == GLFW_KEY_UP)
+			{
+				auto const windowPos = GetWindowPos(window);
+				glfwSetWindowPos(window, windowPos.first, windowPos.second-10);
+			}
+
+			if (key == GLFW_KEY_DOWN)
+			{
+				auto const windowPos = GetWindowPos(window);
+				glfwSetWindowPos(window, windowPos.first, windowPos.second + 10);
+			}
+
+			if (key == GLFW_KEY_RIGHT)
+			{
+				auto const windowPos = GetWindowPos(window);
+				glfwSetWindowPos(window, windowPos.first + 10, windowPos.second);
+			}
+
+			if (key == GLFW_KEY_LEFT)
+			{
+				auto const windowPos = GetWindowPos(window);
+				glfwSetWindowPos(window, windowPos.first - 10, windowPos.second);
 			}
 		};
 
@@ -67,9 +121,40 @@ public:
 
 	void Run()
 	{
+		std::array const vertex_data = {
+			 0.0F,  0.7F,
+			-0.7F, -0.7F,
+			 0.7F, -0.7F,
+		};
+
+		GLuint const triangle_buffer = []() {
+			GLuint val;
+			glGenBuffers(1, &val);
+			return val;
+		}();
+
+		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data.data(), GL_STATIC_DRAW);
+
+		GLuint const vao = []() {
+			GLuint val;
+			glGenVertexArrays(1, &val);
+			return val;
+		}();
+
+		glBindVertexArray(vao);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
+
 		while (!glfwWindowShouldClose(_window))
 		{
+			glClearColor(0.1F, 0.1F, 0.1F, 1.0F);
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+
 			glfwPollEvents();
+			glfwSwapBuffers(_window);
 		}
 	}
 
