@@ -6,6 +6,9 @@
 #include <utility>
 #include <array>
 
+#include "Shader.h"
+
+
 class GLContext
 {
 public:
@@ -13,7 +16,7 @@ public:
 	GLContext()
 	{
 		glfwInit();
-		_window = glfwCreateWindow(800, 600, "ogs", NULL, NULL);
+		_window = glfwCreateWindow(800, 800, "ogs", NULL, NULL);
 
 		if (!_window)
 		{
@@ -30,8 +33,16 @@ public:
 			std::exit(-1);
 		}
 
-		auto KeypressCallback = [](GLFWwindow* window, int key, int scandcode, int action, int mods) 
+		auto ResizeCallback = [](GLFWwindow* window, int xsize, int ysize)
 		{
+			glViewport(0, 0, xsize, ysize);
+		};
+
+		glfwSetWindowSizeCallback(_window, ResizeCallback);
+
+		auto KeypressCallback = [](GLFWwindow* window, int key, int scandcode, int action, int mods)
+		{
+
 			if (action != GLFW_PRESS)
 			{
 				return;
@@ -42,7 +53,7 @@ public:
 				glfwSetWindowShouldClose(window, GLFW_TRUE);
 			}
 
-			if (key == GLFW_KEY_ENTER && 
+			if (key == GLFW_KEY_ENTER &&
 				(mods & GLFW_MOD_ALT))
 			{
 				auto const maximized = glfwGetWindowAttrib(window, GLFW_MAXIMIZED);
@@ -66,7 +77,7 @@ public:
 			if (key == GLFW_KEY_UP)
 			{
 				auto const windowPos = GetWindowPos(window);
-				glfwSetWindowPos(window, windowPos.first, windowPos.second-10);
+				glfwSetWindowPos(window, windowPos.first, windowPos.second - 10);
 			}
 
 			if (key == GLFW_KEY_DOWN)
@@ -105,7 +116,7 @@ public:
 					return std::make_pair(x, y);
 				}();
 
-				std::cout << "bang!\n" << "mouse pos = {" << mousePos.first << ", " << mousePos.second <<"}\n";
+				std::cout << "bang!\n" << "mouse pos = {" << mousePos.first << ", " << mousePos.second << "}\n";
 			}
 		};
 
@@ -119,12 +130,21 @@ public:
 		glfwSetScrollCallback(_window, ScrollCallback);
 	}
 
+	~GLContext()
+	{
+		glfwTerminate();
+	}
+
 	void Run()
 	{
 		std::array const vertex_data = {
-			 0.0F,  0.7F,
-			-0.7F, -0.7F,
-			 0.7F, -0.7F,
+			-0.5F,  0.5F,
+			 0.5F,  0.5F,
+			 0.5F, -0.5F,
+
+			 0.5F, -0.5F,
+			-0.5F, -0.5F,
+			-0.5F,  0.5F,
 		};
 
 		GLuint const triangle_buffer = []() {
@@ -146,12 +166,34 @@ public:
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
 
+		Shader test_shader("res/shaders/color.vert", "res/shaders/color.frag");
+		test_shader.Bind();
+
+		test_shader.SetFloat4("u_Color", glm::vec4(0.2f, 0.8f, 0.4f, 1.0f));
+
 		while (!glfwWindowShouldClose(_window))
 		{
 			glClearColor(0.1F, 0.1F, 0.1F, 1.0F);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			glDrawArrays(GL_TRIANGLES, 0, 3);
+			for (float y = -1.0f; y < 1.0f; y += 0.2f)
+			{
+				for (float x = -1.0f; x < 1.0f; x += 0.2f)
+				{
+					glm::mat4 model = glm::mat4(1.0F);
+					model = glm::translate(model, glm::vec3(x, y, 0.0f));
+					model = glm::rotate(model, float(glfwGetTime()), glm::vec3(0.0f, 0.0f, 1.0f));
+					model = glm::scale(model, glm::vec3(0.15f, 0.15f, 0.15f));
+					test_shader.SetMat4("model_matrix", model);
+
+					test_shader.SetFloat4("u_Color", glm::vec4(
+						(x / 2.f + 0.5f), 
+						(y / 2.f + 0.5f), 
+						((1.0f + glm::sin(glfwGetTime())) / 2.0f ),
+						1.0f));
+					glDrawArrays(GL_TRIANGLES, 0, 6);
+				}
+			}
 
 			glfwPollEvents();
 			glfwSwapBuffers(_window);
