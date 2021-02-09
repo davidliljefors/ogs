@@ -184,7 +184,7 @@ public:
 					model = glm::translate(model, glm::vec3(x, y, 0.0f));
 					model = glm::rotate(model, float(glfwGetTime()), glm::vec3(0.0f, 0.0f, 1.0f));
 					model = glm::scale(model, glm::vec3(0.15f, 0.15f, 0.15f));
-					test_shader.SetMat4("model_matrix", model);
+					test_shader.SetMat4("u_Model", model);
 
 					test_shader.SetFloat4("u_Color", glm::vec4(
 						(x / 2.f + 0.5f), 
