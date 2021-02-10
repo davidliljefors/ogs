@@ -11,6 +11,7 @@ public:
 	VertexArray(std::array<float, vertex_count> const& vertex_data, 
 				std::array<int, index_count> const& index_data ,
 				VertexBufferLayout const& layout)
+		:_indices(index_count)
 	{
 		auto GenGL = [](auto gl_func)
 		{
@@ -52,6 +53,11 @@ public:
 		glDeleteVertexArrays(1, &_id);
 	}
 
+	auto Count() const
+	{
+		return _indices;
+	}
+
 	void Bind() const
 	{
 		glBindVertexArray(_id);
@@ -59,4 +65,5 @@ public:
 
 private:
 	GLuint _id;
+	GLuint _indices;
 };

@@ -147,10 +147,10 @@ public:
 		};
 
 		std::array const vertex_data2 = {
-			-0.5F,  0.5F,  1.0f,  0.0f,
-			 0.5F,  0.5F,  0.0f,  0.0f,
-			 0.5F, -0.5F,  0.0f,  1.0f,
-			-0.5F, -0.5F,  1.0f,  1.0f,
+			-0.3F,  0.3F,  1.0f,  0.0f,
+			 0.3F,  0.3F,  0.0f,  0.0f,
+			 0.3F, -0.3F,  0.0f,  1.0f,
+			-0.3F, -0.3F,  1.0f,  1.0f,
 		};
 
 		std::array const index_data = {
@@ -181,12 +181,12 @@ public:
 			glm::mat4 model = glm::mat4(1.0F);
 			model = glm::translate(model, glm::vec3(-0.5f, 0.0f, 0.0f));
 			test_shader.SetMat4("u_Model", model);
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, vao.Count(), GL_UNSIGNED_INT, 0);
 
 			vao2.Bind();
 			model = glm::translate(model, glm::vec3(1.f, 0.0f, 0.0f));
 			test_shader.SetMat4("u_Model", model);
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, vao2.Count(), GL_UNSIGNED_INT, 0);
 
 			glfwPollEvents();
 			glfwSwapBuffers(_window);
