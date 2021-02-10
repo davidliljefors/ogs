@@ -27,11 +27,11 @@ public:
 		glBindVertexArray(_id);
 
 		{
-			auto& elements = layout.GetElements();
+			auto const& elements = layout.GetElements();
 			std::ptrdiff_t offset = 0;
 			for (GLuint i = 0; i < elements.size(); ++i)
 			{
-				auto& element = elements[i];
+				auto const& element = elements[i];
 				glEnableVertexAttribArray(i);
 				glVertexAttribPointer(i, element.count, element.type,
 					element.normalized, layout.GetStride(), (const void*)offset);
