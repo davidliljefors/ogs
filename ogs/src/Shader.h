@@ -19,13 +19,13 @@ public:
 	inline void SetFloat3(std::string const& name, glm::vec3 const& value)
 	{
 		GLint const location = glGetUniformLocation(program, name.c_str());
-		glUniform3f(location, value.x, value.y, value.z);
+		glUniform3fv(location, 1, glm::value_ptr(value));
 	}
 
 	inline void SetFloat4(std::string const& name, glm::vec4 const& value)
 	{
 		GLint const location = glGetUniformLocation(program, name.c_str());
-		glUniform4f(location, value.x, value.y, value.z, value.w);
+		glUniform4fv(location, 1, glm::value_ptr(value));
 	}
 
 	inline void SetMat4(std::string const& name, glm::mat4 const& value)
