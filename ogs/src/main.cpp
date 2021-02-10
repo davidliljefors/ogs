@@ -7,6 +7,8 @@
 #include <array>
 
 #include "Shader.h"
+#include "VertexArray.h"
+#include "VertexBufferLayout.h"
 
 
 class GLContext
@@ -138,10 +140,17 @@ public:
 	void Run()
 	{
 		std::array const vertex_data = {
-			-0.5F,  0.5F,
-			 0.5F,  0.5F,
-			 0.5F, -0.5F,
-			-0.5F, -0.5F,
+			-0.5F,  0.5F,  0.0f,  1.0f,
+			 0.5F,  0.5F,  1.0f,  1.0f,
+			 0.5F, -0.5F,  1.0f,  0.0f,
+			-0.5F, -0.5F,  0.0f,  0.0f,
+		};
+
+		std::array const vertex_data2 = {
+			-0.5F,  0.5F,  1.0f,  0.0f,
+			 0.5F,  0.5F,  0.0f,  0.0f,
+			 0.5F, -0.5F,  0.0f,  1.0f,
+			-0.5F, -0.5F,  1.0f,  1.0f,
 		};
 
 		std::array const index_data = {
@@ -149,26 +158,14 @@ public:
 			0, 2, 3,
 		};
 
-		auto GenGL = [](auto gl_func) 
-		{
-			GLuint glptr;
-			gl_func(1, &glptr);
-			return glptr;
-		};
+		VertexBufferLayout layout;
+		layout.Push<float>(2);
+		layout.Push<float>(2);
 
+		VertexArray vao(vertex_data, index_data, layout);
+		VertexArray vao2(vertex_data2, index_data, layout);
 
-		auto const triangle_buffer = GenGL(glGenBuffers);
-		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data.data(), GL_STATIC_DRAW);
-
-		auto const vao = GenGL(glGenVertexArrays);
-		glBindVertexArray(vao);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
-
-		auto const ebo = GenGL(glGenBuffers);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_data), index_data.data(), GL_STATIC_DRAW);
+		vao.Bind();
 
 		Shader test_shader("res/shaders/color.vert", "res/shaders/color.frag");
 		test_shader.Bind();
@@ -180,25 +177,16 @@ public:
 			glClearColor(0.1F, 0.1F, 0.1F, 1.0F);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			for (float y = -1.0f; y < 1.0f; y += 0.2f)
-			{
-				for (float x = -1.0f; x < 1.0f; x += 0.2f)
-				{
-					glm::mat4 model = glm::mat4(1.0F);
-					model = glm::translate(model, glm::vec3(x, y, 0.0f));
-					model = glm::rotate(model, float(glfwGetTime()), glm::vec3(0.0f, 0.0f, 1.0f));
-					model = glm::scale(model, glm::vec3(0.15f, 0.15f, 0.15f));
-					test_shader.SetMat4("u_Model", model);
+			vao.Bind();
+			glm::mat4 model = glm::mat4(1.0F);
+			model = glm::translate(model, glm::vec3(-0.5f, 0.0f, 0.0f));
+			test_shader.SetMat4("u_Model", model);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-					test_shader.SetFloat4("u_Color", glm::vec4(
-						(x / 2.f + 0.5f), 
-						(y / 2.f + 0.5f), 
-						((1.0f + glm::sin(glfwGetTime())) / 2.0f ),
-						1.0f));
-
-					glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-				}
-			}
+			vao2.Bind();
+			model = glm::translate(model, glm::vec3(1.f, 0.0f, 0.0f));
+			test_shader.SetMat4("u_Model", model);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 			glfwPollEvents();
 			glfwSwapBuffers(_window);

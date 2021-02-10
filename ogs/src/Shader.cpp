@@ -45,7 +45,6 @@ Shader::Shader(std::string const& vertex_path, std::string const& fragment_path)
 	glAttachShader(program, vert_shader);
 	glAttachShader(program, frag_shader);
 	glLinkProgram(program);
-	glValidateProgram(program);
 
 	glDeleteShader(frag_shader);
 	glDeleteShader(vert_shader);
