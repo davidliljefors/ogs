@@ -10,14 +10,14 @@ Shader::Shader(std::string const& vertex_path, std::string const& fragment_path)
 	: program(glCreateProgram())
 {
 	auto read_file = [](std::string const& file_path) {
-		std::ifstream ifs(file_path.c_str());
+		std::ifstream ifs(file_path);
 		std::ostringstream os;
 		os << ifs.rdbuf();
 		return os.str();
 	};
 
 	constexpr auto err_buff_size = 1024;
-	GLchar error_buffer[err_buff_size];
+	static GLchar shader_error_buffer[err_buff_size];
 
 	// Vert shader
 	auto const vert_source = read_file(vertex_path);
@@ -27,9 +27,9 @@ Shader::Shader(std::string const& vertex_path, std::string const& fragment_path)
 	glShaderSource(vert_shader, 1, &vert_cstr, 0);
 	glCompileShader(vert_shader);
 
-	glGetShaderInfoLog(vert_shader, err_buff_size, NULL, error_buffer);
+	glGetShaderInfoLog(vert_shader, err_buff_size, NULL, shader_error_buffer);
 	std::cout << "Vertex Shader Compile\n";
-	std::cerr << error_buffer;
+	std::cerr << shader_error_buffer;
 
 	// Frag shader
 	auto const frag_source = read_file(fragment_path);
@@ -40,9 +40,9 @@ Shader::Shader(std::string const& vertex_path, std::string const& fragment_path)
 	glCompileShader(frag_shader);
 
 
-	glGetShaderInfoLog(frag_shader, err_buff_size, NULL, error_buffer);
+	glGetShaderInfoLog(frag_shader, err_buff_size, NULL, shader_error_buffer);
 	std::cout << "Fragment Shader Compile\n";
-	std::cerr << error_buffer;
+	std::cerr << shader_error_buffer;
 
 	glAttachShader(program, vert_shader);
 	glAttachShader(program, frag_shader);
