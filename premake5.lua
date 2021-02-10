@@ -29,6 +29,9 @@ project "ogs"
 	cppdialect "C++20"
 	staticruntime "on"
 
+	warnings "Extra"
+	flags  { "FatalWarnings" }
+
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
@@ -69,7 +72,8 @@ project "ogs"
 		defines
 		{
 			"OGS_PLATFORM_WINDOWS",
-			"GLFW_INCLUDE_NONE"
+			"GLFW_INCLUDE_NONE",
+			"GLM_FORCE_SILENT_WARNINGS"
 		}
 
 	filter "configurations:Debug"

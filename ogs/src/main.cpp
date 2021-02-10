@@ -33,14 +33,14 @@ public:
 			std::exit(-1);
 		}
 
-		auto ResizeCallback = [](GLFWwindow* window, int xsize, int ysize)
+		auto ResizeCallback = [](GLFWwindow*, int xsize, int ysize)
 		{
 			glViewport(0, 0, xsize, ysize);
 		};
 
 		glfwSetWindowSizeCallback(_window, ResizeCallback);
 
-		auto KeypressCallback = [](GLFWwindow* window, int key, int scandcode, int action, int mods)
+		auto KeypressCallback = [](GLFWwindow* window, int key, int, int action, int mods)
 		{
 
 			if (action != GLFW_PRESS)
@@ -101,7 +101,7 @@ public:
 
 		glfwSetKeyCallback(_window, KeypressCallback);
 
-		auto MouseButtonCallback = [](GLFWwindow* window, int button, int action, int mods)
+		auto MouseButtonCallback = [](GLFWwindow* window, int button, int action, int)
 		{
 			if (action != GLFW_PRESS)
 			{
@@ -122,7 +122,7 @@ public:
 
 		glfwSetMouseButtonCallback(_window, MouseButtonCallback);
 
-		auto ScrollCallback = [](GLFWwindow* window, double xoffset, double yoffset)
+		auto ScrollCallback = [](GLFWwindow*, double xoffset, double yoffset)
 		{
 			std::cout << "Scrolled x: " << xoffset << ", y: " << yoffset << ".\n";
 		};
@@ -141,30 +141,34 @@ public:
 			-0.5F,  0.5F,
 			 0.5F,  0.5F,
 			 0.5F, -0.5F,
-
-			 0.5F, -0.5F,
 			-0.5F, -0.5F,
-			-0.5F,  0.5F,
 		};
 
-		GLuint const triangle_buffer = []() {
-			GLuint val;
-			glGenBuffers(1, &val);
-			return val;
-		}();
+		std::array const index_data = {
+			0, 1, 2,
+			0, 2, 3,
+		};
 
+		auto GenGL = [](auto gl_func) 
+		{
+			GLuint glptr;
+			gl_func(1, &glptr);
+			return glptr;
+		};
+
+
+		auto const triangle_buffer = GenGL(glGenBuffers);
 		glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data.data(), GL_STATIC_DRAW);
 
-		GLuint const vao = []() {
-			GLuint val;
-			glGenVertexArrays(1, &val);
-			return val;
-		}();
-
+		auto const vao = GenGL(glGenVertexArrays);
 		glBindVertexArray(vao);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
+
+		auto const ebo = GenGL(glGenBuffers);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_data), index_data.data(), GL_STATIC_DRAW);
 
 		Shader test_shader("res/shaders/color.vert", "res/shaders/color.frag");
 		test_shader.Bind();
@@ -191,7 +195,8 @@ public:
 						(y / 2.f + 0.5f), 
 						((1.0f + glm::sin(glfwGetTime())) / 2.0f ),
 						1.0f));
-					glDrawArrays(GL_TRIANGLES, 0, 6);
+
+					glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 				}
 			}
 
