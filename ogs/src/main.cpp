@@ -10,7 +10,6 @@
 #include "VertexArray.h"
 #include "VertexBufferLayout.h"
 
-
 class GLContext
 {
 public:
@@ -139,54 +138,120 @@ public:
 
 	void Run()
 	{
-		std::array const vertex_data = {
-			-0.5F,  0.5F,  0.0f,  1.0f,
-			 0.5F,  0.5F,  1.0f,  1.0f,
-			 0.5F, -0.5F,  1.0f,  0.0f,
-			-0.5F, -0.5F,  0.0f,  0.0f,
+		std::array const tetramino_square_data = {
+			-1.0F,  1.0F,
+			 1.0F,  1.0F,
+			 1.0F, -1.0F,
+			-1.0F, -1.0F,
 		};
 
-		std::array const vertex_data2 = {
-			-0.3F,  0.3F,  1.0f,  0.0f,
-			 0.3F,  0.3F,  0.0f,  0.0f,
-			 0.3F, -0.3F,  0.0f,  1.0f,
-			-0.3F, -0.3F,  1.0f,  1.0f,
+		std::array const tetramino_I_data = {
+			-1.5F,  0.5F,
+			 1.5F,  0.5F,
+			 1.5F, -0.5F,
+			-1.5F, -0.5F,
 		};
 
-		std::array const index_data = {
+		std::array const tetramino_L_data = {
+			-0.5F,  0.5F,
+			 1.5F,  0.5F,
+			 1.5F, -0.5F,
+			-0.5F, -0.5F,
+
+			-0.5F, -0.5F,
+			 0.5F, -0.5F,
+			 0.5F, -2.5F,
+			-0.5F, -2.5F,
+		};
+
+		std::array const tetramino_Z_data = {
+			 0.0F, -1.5F,
+			 1.0F, -1.5F,
+			 1.0F,  0.5F,
+			 0.0F,  0.5F,
+
+			-1.0F, -0.5F,
+			 0.0F, -0.5F,
+			 0.0F,  1.5F,
+			-1.0F,  1.5F,
+		};
+
+		std::array const tetramino_T_data = {
+			-1.5F,  0.5F,
+			 1.5F,  0.5F,
+			 1.5F, -0.5F,
+			-1.5F, -0.5F,
+
+			-0.5F, -1.5F,
+			 0.5F, -1.5F,
+			 0.5F, -0.5F,
+			-0.5F, -0.5F,
+		};
+
+		std::array const quad_idx_data = {
 			0, 1, 2,
 			0, 2, 3,
 		};
 
+		std::array const two_quad_idx_data = {
+			0, 1, 2,
+			0, 2, 3,
+			4, 5, 6,
+			4, 6, 7,
+		};
+
 		VertexBufferLayout layout;
 		layout.Push<float>(2);
-		layout.Push<float>(2);
 
-		VertexArray vao(vertex_data, index_data, layout);
-		VertexArray vao2(vertex_data2, index_data, layout);
+		VertexArray const tetramino_square_vao(tetramino_square_data, quad_idx_data, layout);
+		VertexArray const tetramino_I_vao(tetramino_I_data, quad_idx_data, layout);
+		VertexArray const tetramino_L_vao(tetramino_L_data, two_quad_idx_data, layout);
+		VertexArray const tetramino_Z_vao(tetramino_Z_data, two_quad_idx_data, layout);
+		VertexArray const tetramino_T_vao(tetramino_T_data, two_quad_idx_data, layout);
 
-		vao.Bind();
+		tetramino_square_vao.Bind();
 
 		Shader test_shader("res/shaders/color.vert", "res/shaders/color.frag");
 		test_shader.Bind();
-
-		test_shader.SetFloat4("u_Color", glm::vec4(0.2f, 0.8f, 0.4f, 1.0f));
+		test_shader.SetFloat4("u_Color", glm::vec4(0.2F, 0.8F, 0.4F, 1.0F));
 
 		while (!glfwWindowShouldClose(_window))
 		{
 			glClearColor(0.1F, 0.1F, 0.1F, 1.0F);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			vao.Bind();
 			glm::mat4 model = glm::mat4(1.0F);
-			model = glm::translate(model, glm::vec3(-0.5f, 0.0f, 0.0f));
-			test_shader.SetMat4("u_Model", model);
-			glDrawElements(GL_TRIANGLES, vao.Count(), GL_UNSIGNED_INT, 0);
+			model = glm::scale(model, glm::vec3(0.25F, 0.25F, 0.25F));
 
-			vao2.Bind();
-			model = glm::translate(model, glm::vec3(1.f, 0.0f, 0.0f));
+			tetramino_square_vao.Bind();
+			model = glm::translate(model, glm::vec3(-2.5F, 2.5F, 0.0F));
 			test_shader.SetMat4("u_Model", model);
-			glDrawElements(GL_TRIANGLES, vao2.Count(), GL_UNSIGNED_INT, 0);
+			test_shader.SetFloat4("u_Color", glm::vec4(0.99F, 0.9F, 0.3F, 1.0F));
+			glDrawElements(GL_TRIANGLES, tetramino_square_vao.Count(), GL_UNSIGNED_INT, 0);
+
+			tetramino_I_vao.Bind();
+			model = glm::translate(model, glm::vec3(4.0F, 0.0F, 0.0F));
+			test_shader.SetMat4("u_Model", model);
+			test_shader.SetFloat4("u_Color", glm::vec4(0.4F, 0.97F, 0.95F, 1.0F));
+			glDrawElements(GL_TRIANGLES, tetramino_I_vao.Count(), GL_UNSIGNED_INT, 0);
+
+			tetramino_L_vao.Bind();
+			model = glm::translate(model, glm::vec3(-4.5F, -2.0F, 0.0F));
+			test_shader.SetMat4("u_Model", model);
+			test_shader.SetFloat4("u_Color", glm::vec4(1.0F, 0.6F, 0.2F, 1.0F));
+			glDrawElements(GL_TRIANGLES, tetramino_L_vao.Count(), GL_UNSIGNED_INT, 0);
+
+			tetramino_Z_vao.Bind();
+			model = glm::translate(model, glm::vec3(5.5F, -1.0F, 0.0F));
+			test_shader.SetMat4("u_Model", model);
+			test_shader.SetFloat4("u_Color", glm::vec4(0.1F, 1.0F, 0.4F, 1.0F));
+			glDrawElements(GL_TRIANGLES, tetramino_Z_vao.Count(), GL_UNSIGNED_INT, 0);
+
+			tetramino_T_vao.Bind();
+			model = glm::translate(model, glm::vec3(-3.0F, -1.0F, 0.0F));
+			test_shader.SetMat4("u_Model", model);
+			test_shader.SetFloat4("u_Color", glm::vec4(1.0F, 0.45F, 0.9F, 1.0F));
+			glDrawElements(GL_TRIANGLES, tetramino_T_vao.Count(), GL_UNSIGNED_INT, 0);
 
 			glfwPollEvents();
 			glfwSwapBuffers(_window);
