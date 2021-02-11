@@ -183,15 +183,15 @@ void GLContext::Run()
 	glm::vec3 scale(0.1F);
 	glm::vec3 pos(0.0f);
 
-	auto update_time = [last_time = 0.0]() mutable {
-		float const dt = static_cast<float>(glfwGetTime() - last_time);
+	auto UpdateTime = [last_time = 0.0]() mutable {
+		float const delta_time = static_cast<float>(glfwGetTime() - last_time);
 		last_time = glfwGetTime();
-		return dt;
+		return delta_time;
 	};
 
 	while (!glfwWindowShouldClose(_window))
 	{
-		float const dt = update_time();
+		float const dt = UpdateTime();
 
 		glClearColor(0.1F, 0.1F, 0.1F, 1.0F);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -220,7 +220,7 @@ void GLContext::Run()
 		}
 
 		glm::mat4 model = glm::mat4(1.0F);
-		model = glm::scale(model, {0.25F, 0.25F, 0.25F});
+		model = glm::scale(model, glm::vec3(0.25F, 0.25F, 0.25F));
 		model = glm::scale(model, scale);
 		model = glm::translate(model, pos);
 

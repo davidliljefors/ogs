@@ -10,14 +10,14 @@
 Shader::Shader(std::string const& vertex_path, std::string const& fragment_path)
 	: program(glCreateProgram())
 {
-	auto read_file = [](std::string const& file_path) {
+	auto ReadFile = [](std::string const& file_path) {
 		std::ifstream ifs(file_path);
 		std::ostringstream os;
 		os << ifs.rdbuf();
 		return os.str();
 	};
 
-	auto compile_shader = [](std::string const& shader_source, int shader_type)
+	auto CompileShader = [](std::string const& shader_source, int shader_type)
 	{
 		GLchar const* vert_cstr = shader_source.c_str();
 		GLuint const shader = glCreateShader(shader_type);
@@ -39,8 +39,8 @@ Shader::Shader(std::string const& vertex_path, std::string const& fragment_path)
 		return shader;
 	};
 
-	auto const frag_shader = compile_shader(read_file(fragment_path), GL_FRAGMENT_SHADER);
-	auto const vert_shader = compile_shader(read_file(vertex_path), GL_VERTEX_SHADER);
+	auto const frag_shader = CompileShader(ReadFile(fragment_path), GL_FRAGMENT_SHADER);
+	auto const vert_shader = CompileShader(ReadFile(vertex_path), GL_VERTEX_SHADER);
 
 	glAttachShader(program, vert_shader);
 	glAttachShader(program, frag_shader);
