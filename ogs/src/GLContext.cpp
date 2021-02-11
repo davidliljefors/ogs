@@ -191,32 +191,32 @@ void GLContext::Run()
 
 	while (!glfwWindowShouldClose(_window))
 	{
-		float const delta_time = update_time();
+		float const dt = update_time();
 
 		glClearColor(0.1F, 0.1F, 0.1F, 1.0F);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		if (GetKey(GLFW_KEY_RIGHT).held)
 		{
-			pos.x += 0.1f;
+			pos.x += 10.0F * dt;
 		}
 		if (GetKey(GLFW_KEY_LEFT).held)
 		{
-			pos.x -= 0.1f;
+			pos.x -= 10.0F * dt;
 		}
 
 		if (GetKey(GLFW_KEY_UP).held)
 		{
-			scale.x += 0.01f;
-			scale.y += 0.01f;
-			scale.z += 0.01f;
+			scale.x += 1.0F * dt;
+			scale.y += 1.0F * dt;
+			scale.z += 1.0F * dt;
 		}
 
 		if (GetKey(GLFW_KEY_DOWN).held)
 		{
-			scale.x -= 0.01f;
-			scale.y -= 0.01f;
-			scale.z -= 0.01f;
+			scale.x -= 1.0F * dt;
+			scale.y -= 1.0F * dt;
+			scale.z -= 1.0F * dt;
 		}
 
 		glm::mat4 model = glm::mat4(1.0F);
