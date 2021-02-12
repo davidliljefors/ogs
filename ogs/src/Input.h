@@ -3,8 +3,10 @@
 #include <GLFW/glfw3.h>
 #include <array>
 
-class Input
-{
+namespace ogs {
+
+class Input {
+
 public:
 	void KeyEvent(int key, int action)
 	{
@@ -34,3 +36,4 @@ private:
 
 	std::array<KeyState, GLFW_KEY_LAST> _keys;
 };
+}

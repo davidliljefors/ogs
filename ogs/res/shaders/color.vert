@@ -1,7 +1,7 @@
 #version 330 core
 
-in vec2 a_Position;
-in vec2 a_TexCoord;
+layout(location = 0) in vec2 a_Position;
+layout(location = 1) in vec2 a_TexCoord;
 
 out vec2 f_TexCoord;
 
