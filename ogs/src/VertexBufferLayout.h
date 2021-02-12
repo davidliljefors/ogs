@@ -3,11 +3,13 @@
 #include <vector>
 #include <cassert>
 
-struct VertexBufferElement
-{
-	unsigned int type;
-	unsigned int count;
-	unsigned char normalized;
+namespace ogs {
+
+struct VertexBufferElement {
+
+	unsigned int type = 0;
+	unsigned int count = 0;
+	unsigned char normalized = 0;
 
 	static unsigned int GetSizeOfType(unsigned int type)
 	{
@@ -15,22 +17,16 @@ struct VertexBufferElement
 		{
 		case GL_FLOAT: return 4;
 		case GL_UNSIGNED_INT: return 4;
-		case GL_UNSIGNED_BYTE: return 4;
 		}
 		assert(false && "Invalid GL Type");
 		return 0;
 	}
 };
 
-class VertexBufferLayout
-{
-private:
-	std::vector<VertexBufferElement> _elements;
-	unsigned int _stride;
+class VertexBufferLayout {
 
 public:
-	VertexBufferLayout()
-		:_stride(0) {}
+	VertexBufferLayout() {}
 
 	template<typename T>
 	void Push(unsigned int count)
@@ -52,13 +48,12 @@ public:
 		_stride += count * VertexBufferElement::GetSizeOfType(GL_UNSIGNED_INT);
 	}
 
-	template<>
-	void Push<unsigned char>(unsigned int count)
-	{
-		_elements.push_back({ GL_UNSIGNED_BYTE, count, GL_TRUE });
-		_stride += count * VertexBufferElement::GetSizeOfType(GL_UNSIGNED_BYTE);
-	}
-
 	inline const std::vector<VertexBufferElement>& GetElements() const { return _elements; }
 	inline unsigned int GetStride() const { return _stride; }
+
+private:
+	std::vector<VertexBufferElement> _elements;
+	unsigned int _stride = 0;
+
 };
+}

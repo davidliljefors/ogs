@@ -1,7 +1,7 @@
 #include "GLContext.h"
 
 
-GLContext::GLContext()
+ogs::GLContext::GLContext()
 {
 	glfwInit();
 	_window = glfwCreateWindow(800, 800, "ogs", NULL, NULL);
@@ -96,12 +96,12 @@ GLContext::GLContext()
 	glfwSetScrollCallback(_window, ScrollCallback);
 }
 
-GLContext::~GLContext()
+ogs::GLContext::~GLContext()
 {
 	glfwTerminate();
 }
 
-void GLContext::Run()
+void ogs::GLContext::Run()
 {
 	std::array const tetramino_square_data = {
 		-1.0F,  1.0F,

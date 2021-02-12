@@ -2,7 +2,7 @@
 
 int main()
 {
-	GLContext ctx;
+	ogs::GLContext ctx;
 	ctx.Run();
 
 	return 0;

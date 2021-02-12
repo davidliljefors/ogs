@@ -7,7 +7,8 @@
 
 #include "Shader.h"
 
-Shader::Shader(std::string const& vertex_path, std::string const& fragment_path)
+ogs::Shader::Shader(std::string const& vertex_path, 
+					std::string const& fragment_path)
 	: program(glCreateProgram())
 {
 	auto ReadFile = [](std::string const& file_path) {
@@ -50,7 +51,7 @@ Shader::Shader(std::string const& vertex_path, std::string const& fragment_path)
 	glDeleteShader(vert_shader);
 }
 
-void Shader::Bind() const
+void ogs::Shader::Bind() const
 {
 	glUseProgram(program);
 }

@@ -12,22 +12,23 @@
 #include "VertexArray.h"
 #include "VertexBufferLayout.h"
 
+namespace ogs {
 
-class GLContext
-{
+class GLContext {
+
 public:
-
 	GLContext();
 	~GLContext();
 	void Run();
 
 private:
-	auto GetKey(int key)
+	auto GetKey(int glfw_key)
 	{
-		return _input.GetKey(key);
+		return _input.GetKey(glfw_key);
 	}
 
 private:
 	GLFWwindow* _window = nullptr;
 	Input _input;
 };
+}
