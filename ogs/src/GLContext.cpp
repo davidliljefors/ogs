@@ -178,7 +178,7 @@ void ogs::GLContext::Run()
 		auto const time = static_cast<float>(glfwGetTime());
 		test_shader.SetFloat("u_Time", time);
 
-		_camera.Rotate(_input.GetMouseDelta());
+		_camera.Rotate(_input.GetMouseDelta() * 0.3F);
 		auto camera_movement = glm::vec3(0.0F);
 
 		if (GetKey(GLFW_KEY_W).held)
