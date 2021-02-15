@@ -5,11 +5,11 @@ layout(location = 1) in vec2 a_TexCoord;
 
 out vec2 f_TexCoord;
 out vec2 f_Position;
-uniform mat4 u_Model;
+uniform mat4 u_MVP;
 
 void main()
 {
     f_TexCoord = a_TexCoord;
-    f_Position = a_Position;
-    gl_Position =  u_Model * vec4(a_Position, 0.0, 1.0);
+    gl_Position =  u_MVP * vec4(a_Position, 0.0, 1.0);
+    f_Position = gl_Position.xy;
 }

@@ -2,9 +2,14 @@
 
 
 ogs::GLContext::GLContext(WindowProps window_props)
-	:_data(window_props)
+	:_window_props(window_props), _camera(_window_props.GetAspect())
 {
+	_data.input = &_input;
+	_data.window_props = &_window_props;
+
 	glfwInit();
+	glfwWindowHint(GLFW_SAMPLES, 4);
+	
 	_window = glfwCreateWindow(window_props.GetWidth(), window_props.GetHeight(), "ogs", nullptr, nullptr);
 
 	if (!_window)
@@ -16,6 +21,7 @@ ogs::GLContext::GLContext(WindowProps window_props)
 
 	glfwMakeContextCurrent(_window);
 	glfwSetWindowUserPointer(_window, &_data);
+	
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -27,7 +33,7 @@ ogs::GLContext::GLContext(WindowProps window_props)
 	{
 		auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer(window));
 		assert(user_data && "Window User Pointer should not be null!");
-		user_data->window_props = { xsize, ysize };
+		*user_data->window_props = { xsize, ysize };
 		glViewport(0, 0, xsize, ysize);
 	};
 
@@ -38,7 +44,7 @@ ogs::GLContext::GLContext(WindowProps window_props)
 		auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer(window));
 		assert(user_data && "Window User Pointer should not be null!");
 
-		user_data->input.KeyEvent(key, action);
+		user_data->input->KeyEvent(key, action);
 
 		if (action != GLFW_PRESS)
 		{
@@ -71,6 +77,14 @@ ogs::GLContext::GLContext(WindowProps window_props)
 
 	glfwSetKeyCallback(_window, KeypressCallback);
 
+	auto MouseMoveCallback = [](GLFWwindow* window, double xpos, double ypos)
+	{
+		auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer(window));
+		user_data->input->MouseMove(xpos, ypos);
+	};
+
+	glfwSetCursorPosCallback(_window, MouseMoveCallback);
+
 	auto MouseButtonCallback = [](GLFWwindow* window, int button, int action, int)
 	{
 		if (action != GLFW_PRESS)
@@ -98,6 +112,11 @@ ogs::GLContext::GLContext(WindowProps window_props)
 	};
 
 	glfwSetScrollCallback(_window, ScrollCallback);
+
+	if (glfwRawMouseMotionSupported())
+		glfwSetInputMode(_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+
+	glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 ogs::GLContext::~GLContext()
@@ -144,73 +163,62 @@ void ogs::GLContext::Run()
 		return delta_time;
 	};
 
-	glm::vec3 scale(0.5F);
+	glm::vec3 scale(1.0F);
 	glm::vec3 pos(0.0F);
-	float rotation = 0.0F;
-	pos.z = -1.0F;
+
+	glEnable(GL_MULTISAMPLE);
+	_camera.SetPosition(glm::vec3(0.0F, 0.0F, 2.0F));
 
 	while (!glfwWindowShouldClose(_window))
 	{
+		glClearColor(0.1F, 0.1F, 0.1F, 1.0F);
+		glClear(GL_COLOR_BUFFER_BIT);
+
 		auto const dt = UpdateTime();
 		auto const time = static_cast<float>(glfwGetTime());
 		test_shader.SetFloat("u_Time", time);
 
-		glClearColor(0.1F, 0.1F, 0.1F, 1.0F);
-		glClear(GL_COLOR_BUFFER_BIT);
+		_camera.Rotate(_input.GetMouseDelta());
+		auto camera_movement = glm::vec3(0.0F);
 
 		if (GetKey(GLFW_KEY_W).held)
 		{
-			scale.x += 1.0F * dt;
-			scale.y += 1.0F * dt;
+			camera_movement.y = 3.0F * dt;
 		}
 
 		if (GetKey(GLFW_KEY_S).held)
 		{
-			scale.x -= 1.0F * dt;
-			scale.y -= 1.0F * dt;
+			camera_movement.y = -3.0F * dt;
 		}
-
-		if (GetKey(GLFW_KEY_RIGHT).held)
-		{
-			pos.x += 5.0F * dt;
-		}
-		if (GetKey(GLFW_KEY_LEFT).held)
-		{
-			pos.x -= 5.0F * dt;
-		}
-
-		if (GetKey(GLFW_KEY_UP).held)
-		{
-			pos.y += 5.0F * dt;
-		}
-
-		if (GetKey(GLFW_KEY_DOWN).held)
-		{
-			pos.y -= 5.0F * dt;
-		}
-
 		if (GetKey(GLFW_KEY_A).held)
 		{
-			rotation += 3.0F * dt;
+			camera_movement.x = 3.0F * dt;
 		}
 
 		if (GetKey(GLFW_KEY_D).held)
 		{
-			rotation -= 3.0F * dt;
+			camera_movement.x = -3.0F * dt;
 		}
-		
+
+		_camera.Move(camera_movement);
+
 		auto const projection = glm::perspective(glm::radians(90.0F), GetAspect(), 0.1F, 100.F);
+		auto const view = glm::lookAt(glm::vec3(1.0F, 1.0F, 1.0F) * 2.0F, glm::vec3(0.0F), glm::vec3(0.0F, 1.0F, 0.0F));
+		
 
 		auto model = glm::translate(glm::mat4(1.0F), pos);
 		model = glm::scale(model, scale);
-		model = glm::rotate(model, rotation, glm::vec3(0.0F, 0.0F, 1.0F));
-		model = glm::rotate(model, glm::radians(90.F * time), glm::vec3(0.0F, 1.0F, 0.0F));
+		//model = glm::rotate(model, rotation, glm::vec3{ 0.0F, 0.0F, 1.0F });
+		//model = glm::rotate(model, glm::radians(90.F * time), { 0.0F, 1.0F, 0.0F });
+
+		auto const MVP = _camera.GetVP() * model;
+		test_shader.SetMat4("u_MVP", MVP);
+		test_shader.SetFloat4("u_Color", { 0.99F, 0.9F, 0.3F, 1.0F });
+
 		quad_vao.Bind();
-		test_shader.SetMat4("u_Model", model);
-		test_shader.SetMat4("u_Projection", projection);
-		test_shader.SetFloat4("u_Color", glm::vec4(0.99F, 0.9F, 0.3F, 1.0F));
 		glDrawElements(GL_TRIANGLES, quad_vao.Count(), GL_UNSIGNED_INT, nullptr);
 
+		_input.Update();
 		glfwPollEvents();
 		glfwSwapBuffers(_window);
 	}

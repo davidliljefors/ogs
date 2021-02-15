@@ -12,6 +12,7 @@
 #include "VertexArray.h"
 #include "VertexBufferLayout.h"
 #include "Texture.h"
+#include "Camera.h"
 
 namespace ogs {
 
@@ -36,9 +37,8 @@ public:
 
 	struct WindowUserData
 	{
-		WindowUserData(WindowProps props) : window_props(props) { }
-		Input input;
-		WindowProps window_props;
+		Input* input;
+		WindowProps* window_props;
 	};
 
 public:
@@ -49,22 +49,25 @@ public:
 
 	inline auto GetViewport()
 	{
-		return glm::vec2(_data.window_props.GetWidth(), _data.window_props.GetHeight());
+		return glm::vec2(_window_props.GetWidth(), _window_props.GetHeight());
 	}
 
 	inline auto GetAspect()
 	{
-		return _data.window_props.GetAspect();
+		return _window_props.GetAspect();
 	}
 
 private:
 	inline auto GetKey(int glfw_key)
 	{
-		return _data.input.GetKey(glfw_key);
+		return _input.GetKey(glfw_key);
 	}
 
 private:
 	GLFWwindow* _window = nullptr;
 	WindowUserData _data;
+	Input _input;
+	WindowProps _window_props;
+	Camera _camera;
 };
 }
