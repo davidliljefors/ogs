@@ -1,13 +1,19 @@
 #version 330 core
 
 in vec2 f_TexCoord;
+in vec2 f_Position;
 
 out vec4 FragColor;
 
-uniform sampler2D u_Texture;
+uniform sampler2D u_Tex0;
+uniform sampler2D u_Tex1;
+
+uniform float u_Time;
 uniform vec4 u_Color;
 
 void main()
 {
-    FragColor = texture(u_Texture, f_TexCoord);
+    vec4 col_a = texture(u_Tex0, f_TexCoord);
+    vec4 col_b = texture(u_Tex1, f_TexCoord);
+    FragColor = mix(col_a, col_b, sin(u_Time + f_Position.x + f_Position.y ) * 0.5 + 0.5);
 }

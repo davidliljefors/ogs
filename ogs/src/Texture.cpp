@@ -26,7 +26,7 @@ ogs::Texture::~Texture()
 	glDeleteTextures(1, &_id);
 }
 
-void ogs::Texture::Bind(unsigned int slot)
+void ogs::Texture::Bind(unsigned int slot) const
 {
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, _id);

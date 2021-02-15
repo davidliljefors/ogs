@@ -121,17 +121,18 @@ void ogs::GLContext::Run()
 	layout.Push<float>(2);
 
 	VertexArray const quad_vao(quad_vertex_data, quad_idx_data, layout);
-
-	Texture const texture("res/textures/very_nice_texture.png");
-
 	quad_vao.Bind();
+
+	Texture const texture_ora("res/textures/very_nice_texture.png");
+	Texture const texture_blu("res/textures/cool_texture.png");
+	texture_ora.Bind(0);
+	texture_blu.Bind(1);
 
 	Shader test_shader("res/shaders/color.vert", "res/shaders/color.frag");
 	test_shader.Bind();
-	test_shader.SetFloat4("u_Color", glm::vec4(0.2F, 0.8F, 0.4F, 1.0F));
+	test_shader.SetInt("u_Tex0", 0);
+	test_shader.SetInt("u_Tex1", 1);
 
-	glm::vec3 scale(0.1F);
-	glm::vec3 pos(0.0f);
 
 	auto UpdateTime = [last_time = 0.0]() mutable {
 		float const delta_time = static_cast<float>(glfwGetTime() - last_time);
@@ -139,9 +140,14 @@ void ogs::GLContext::Run()
 		return delta_time;
 	};
 
+	glm::vec3 scale(0.1F);
+	glm::vec3 pos(0.0F);
+	float rotation = 0.0F;
+
 	while (!glfwWindowShouldClose(_window))
 	{
 		float const dt = UpdateTime();
+		test_shader.SetFloat("u_Time", static_cast<float>(glfwGetTime()));
 
 		glClearColor(0.1F, 0.1F, 0.1F, 1.0F);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -177,9 +183,20 @@ void ogs::GLContext::Run()
 			pos.y -= 5.0F * dt;
 		}
 
+		if (GetKey(GLFW_KEY_A).held)
+		{
+			rotation += 3.0F * dt;
+		}
+
+		if (GetKey(GLFW_KEY_D).held)
+		{
+			rotation -= 3.0F * dt;
+		}
+
 		glm::mat4 model = glm::mat4(1.0F);
 		model = glm::translate(model, pos);
 		model = glm::scale(model, scale);
+		model = glm::rotate(model, rotation, glm::vec3(0.0F, 0.0F, 1.0F));
 
 		quad_vao.Bind();
 		test_shader.SetMat4("u_Model", model);
