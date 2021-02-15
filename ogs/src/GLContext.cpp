@@ -1,10 +1,11 @@
 #include "GLContext.h"
 
 
-ogs::GLContext::GLContext()
+ogs::GLContext::GLContext(WindowProps window_props)
+	:_data(window_props)
 {
 	glfwInit();
-	_window = glfwCreateWindow(800, 800, "ogs", NULL, NULL);
+	_window = glfwCreateWindow(window_props.GetWidth(), window_props.GetHeight(), "ogs", nullptr, nullptr);
 
 	if (!_window)
 	{
@@ -14,7 +15,7 @@ ogs::GLContext::GLContext()
 	}
 
 	glfwMakeContextCurrent(_window);
-	glfwSetWindowUserPointer(_window, &_input);
+	glfwSetWindowUserPointer(_window, &_data);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -22,8 +23,11 @@ ogs::GLContext::GLContext()
 		std::exit(-1);
 	}
 
-	auto ResizeCallback = [](GLFWwindow*, int xsize, int ysize)
+	auto ResizeCallback = [](GLFWwindow* window, int xsize, int ysize)
 	{
+		auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer(window));
+		assert(user_data && "Window User Pointer should not be null!");
+		user_data->window_props = { xsize, ysize };
 		glViewport(0, 0, xsize, ysize);
 	};
 
@@ -31,10 +35,10 @@ ogs::GLContext::GLContext()
 
 	auto KeypressCallback = [](GLFWwindow* window, int key, int, int action, int mods)
 	{
-		auto input = static_cast<Input*>(glfwGetWindowUserPointer(window));
-		assert(input && "Window User Pointer should not be null!");
+		auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer(window));
+		assert(user_data && "Window User Pointer should not be null!");
 
-		input->KeyEvent(key, action);
+		user_data->input.KeyEvent(key, action);
 
 		if (action != GLFW_PRESS)
 		{
@@ -135,19 +139,21 @@ void ogs::GLContext::Run()
 
 
 	auto UpdateTime = [last_time = 0.0]() mutable {
-		float const delta_time = static_cast<float>(glfwGetTime() - last_time);
+		auto const delta_time = static_cast<float>(glfwGetTime() - last_time);
 		last_time = glfwGetTime();
 		return delta_time;
 	};
 
-	glm::vec3 scale(0.1F);
+	glm::vec3 scale(0.5F);
 	glm::vec3 pos(0.0F);
 	float rotation = 0.0F;
+	pos.z = -1.0F;
 
 	while (!glfwWindowShouldClose(_window))
 	{
-		float const dt = UpdateTime();
-		test_shader.SetFloat("u_Time", static_cast<float>(glfwGetTime()));
+		auto const dt = UpdateTime();
+		auto const time = static_cast<float>(glfwGetTime());
+		test_shader.SetFloat("u_Time", time);
 
 		glClearColor(0.1F, 0.1F, 0.1F, 1.0F);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -192,17 +198,18 @@ void ogs::GLContext::Run()
 		{
 			rotation -= 3.0F * dt;
 		}
+		
+		auto const projection = glm::perspective(glm::radians(90.0F), GetAspect(), 0.1F, 100.F);
 
-		glm::mat4 model = glm::mat4(1.0F);
-		model = glm::translate(model, pos);
+		auto model = glm::translate(glm::mat4(1.0F), pos);
 		model = glm::scale(model, scale);
 		model = glm::rotate(model, rotation, glm::vec3(0.0F, 0.0F, 1.0F));
-
+		model = glm::rotate(model, glm::radians(90.F * time), glm::vec3(0.0F, 1.0F, 0.0F));
 		quad_vao.Bind();
 		test_shader.SetMat4("u_Model", model);
+		test_shader.SetMat4("u_Projection", projection);
 		test_shader.SetFloat4("u_Color", glm::vec4(0.99F, 0.9F, 0.3F, 1.0F));
-		glDrawElements(GL_TRIANGLES, quad_vao.Count(), GL_UNSIGNED_INT, 0);
-
+		glDrawElements(GL_TRIANGLES, quad_vao.Count(), GL_UNSIGNED_INT, nullptr);
 
 		glfwPollEvents();
 		glfwSwapBuffers(_window);

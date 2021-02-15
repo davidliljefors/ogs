@@ -16,20 +16,55 @@
 namespace ogs {
 
 class GLContext {
+public:
+	class WindowProps
+	{
+	public:
+		WindowProps(int width, int height)
+			:_height(height), _width(width), _aspect(width / static_cast<float>(height))
+		{};
+
+		inline auto GetWidth()  const { return _width; };
+		inline auto GetHeight() const { return _height; };
+		inline auto GetAspect() const { return _aspect; };
+
+	private:
+		int _width;
+		int _height;
+		float _aspect;
+	};
+
+	struct WindowUserData
+	{
+		WindowUserData(WindowProps props) : window_props(props) { }
+		Input input;
+		WindowProps window_props;
+	};
 
 public:
-	GLContext();
+	GLContext(WindowProps window_props);
 	~GLContext();
+
 	void Run();
 
-private:
-	auto GetKey(int glfw_key)
+	inline auto GetViewport()
 	{
-		return _input.GetKey(glfw_key);
+		return glm::vec2(_data.window_props.GetWidth(), _data.window_props.GetHeight());
+	}
+
+	inline auto GetAspect()
+	{
+		return _data.window_props.GetAspect();
+	}
+
+private:
+	inline auto GetKey(int glfw_key)
+	{
+		return _data.input.GetKey(glfw_key);
 	}
 
 private:
 	GLFWwindow* _window = nullptr;
-	Input _input;
+	WindowUserData _data;
 };
 }

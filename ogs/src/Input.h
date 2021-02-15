@@ -34,6 +34,6 @@ private:
 		bool held = false;
 	};
 
-	std::array<KeyState, GLFW_KEY_LAST> _keys;
+	std::array<KeyState, GLFW_KEY_LAST> _keys {};
 };
 }
