@@ -51,7 +51,29 @@ ogs::Shader::Shader(std::string const& vertex_path,
 	glDeleteShader(vert_shader);
 }
 
+ogs::Shader::~Shader()
+{
+	glDeleteProgram(program);
+}
+
 void ogs::Shader::Bind() const
 {
 	glUseProgram(program);
+}
+
+unsigned int ogs::Shader::GetUniformLocation(std::string const& name) const
+{
+	if (uniform_location_cache.contains(name))
+	{
+		return uniform_location_cache[name];
+	}
+
+	auto const location = glGetUniformLocation(program, name.c_str());
+	if (location == -1)
+	{
+		std::cerr << "Warning: uniform '" << name << "' doesn't exist!" << std::endl;
+	}
+
+	uniform_location_cache[name] = location;
+	return location;
 }
