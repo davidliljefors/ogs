@@ -12,18 +12,24 @@ public:
 	inline void Update()
 	{
 		_mouse_delta = glm::vec2(0.0F);
+
+		for (auto& key_sate : _keys)
+		{
+			key_sate.pressed = false;
+			key_sate.released = false;
+		}
 	}
 
-	inline void MouseMove(double x, double y)
+	inline void MouseMove(float x, float y)
 	{
-		auto const mouse_pos = glm::vec2(static_cast<float>(x), static_cast<float>(y));
+		auto const mouse_pos = glm::vec2(x, y);
 		if (_first_mouse)
 		{
 			_last_mouse_pos = mouse_pos;
 			_first_mouse = false;
 		}
 
-		_mouse_delta = mouse_pos - _last_mouse_pos;
+		_mouse_delta += (mouse_pos - _last_mouse_pos);
 		_last_mouse_pos = mouse_pos;
 	}
 
@@ -41,6 +47,7 @@ public:
 	{
 		if (action == GLFW_PRESS)
 		{
+			_keys[key].pressed = true;
 			_keys[key].held = true;
 			return;
 		}
@@ -48,6 +55,7 @@ public:
 		if (action == GLFW_RELEASE)
 		{
 			_keys[key].held = false;
+			_keys[key].released = true;
 			return;
 		}
 	};
@@ -60,7 +68,12 @@ public:
 private:
 	struct KeyState
 	{
+		// True the frame key got pressed
+		bool pressed = false;
+		// True while key is being held
 		bool held = false;
+		// True the frame key got released
+		bool released = false;
 	};
 
 	std::array<KeyState, GLFW_KEY_LAST> _keys {};

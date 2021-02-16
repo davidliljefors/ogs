@@ -69,5 +69,7 @@ private:
 	Input _input;
 	WindowProps _window_props;
 	Camera _camera;
+
+	float _mouse_sensitivity = 0.07F;
 };
 }

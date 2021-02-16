@@ -1,5 +1,11 @@
+#include <Windows.h>
 #include "GLContext.h"
 
+#include <chrono>
+#include <thread>
+
+
+bool newframe = true;
 
 ogs::GLContext::GLContext(WindowProps window_props)
 	:_window_props(window_props), _camera(_window_props.GetAspect())
@@ -77,14 +83,6 @@ ogs::GLContext::GLContext(WindowProps window_props)
 
 	glfwSetKeyCallback(_window, KeypressCallback);
 
-	auto MouseMoveCallback = [](GLFWwindow* window, double xpos, double ypos)
-	{
-		auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer(window));
-		user_data->input->MouseMove(xpos, ypos);
-	};
-
-	glfwSetCursorPosCallback(_window, MouseMoveCallback);
-
 	auto MouseButtonCallback = [](GLFWwindow* window, int button, int action, int)
 	{
 		if (action != GLFW_PRESS)
@@ -113,10 +111,24 @@ ogs::GLContext::GLContext(WindowProps window_props)
 
 	glfwSetScrollCallback(_window, ScrollCallback);
 
-	if (glfwRawMouseMotionSupported())
-		glfwSetInputMode(_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+	auto MouseMoveCallback = [](GLFWwindow* window, double xpos, double ypos)
+	{
+		auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer(window));
+		user_data->input->MouseMove(static_cast<float>(xpos), static_cast<float>(ypos));
+	};
+
+	glfwSetCursorPosCallback(_window, MouseMoveCallback);
 
 	glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSwapInterval(1);
+
+	if (glfwRawMouseMotionSupported())
+	{
+		std::cout << "Raw input enabled\n";
+		glfwSetInputMode(_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+	}
+
+	glEnable(GL_MULTISAMPLE);
 }
 
 ogs::GLContext::~GLContext()
@@ -132,7 +144,6 @@ void ogs::GLContext::Run()
 		 0.5F, -0.5F,  1.0F,  0.0F,
 		-0.5F, -0.5F,  0.0F,  0.0F,
 	};
-
 
 	std::array const quad_idx_data = {
 		0, 1, 2,
@@ -156,17 +167,15 @@ void ogs::GLContext::Run()
 	test_shader.SetInt("u_Tex0", 0);
 	test_shader.SetInt("u_Tex1", 1);
 
-
 	auto UpdateTime = [last_time = 0.0]() mutable {
 		auto const delta_time = static_cast<float>(glfwGetTime() - last_time);
 		last_time = glfwGetTime();
 		return delta_time;
 	};
 
-	glm::vec3 scale(1.0F);
+	glm::vec3 scale(5.0F);
 	glm::vec3 pos(0.0F);
 
-	glEnable(GL_MULTISAMPLE);
 	_camera.SetPosition(glm::vec3(0.0F, 0.0F, 2.0F));
 
 	while (!glfwWindowShouldClose(_window))
@@ -178,9 +187,13 @@ void ogs::GLContext::Run()
 		auto const time = static_cast<float>(glfwGetTime());
 		test_shader.SetFloat("u_Time", time);
 
-		_camera.Rotate(_input.GetMouseDelta() * 0.3F);
+		auto const camera_rot = _input.GetMouseDelta() * _mouse_sensitivity;
+		if (camera_rot.length() > 0.01F)
+		{
+			_camera.Rotate(camera_rot);
+		}
+		
 		auto camera_movement = glm::vec3(0.0F);
-
 		if (GetKey(GLFW_KEY_W).held)
 		{
 			camera_movement.y = 3.0F * dt;
@@ -200,16 +213,23 @@ void ogs::GLContext::Run()
 			camera_movement.x = -3.0F * dt;
 		}
 
-		_camera.Move(camera_movement);
+		if (camera_movement.length() > 0.01F)
+		{
+			_camera.Move(camera_movement);
+		}
 
-		auto const projection = glm::perspective(glm::radians(90.0F), GetAspect(), 0.1F, 100.F);
-		auto const view = glm::lookAt(glm::vec3(1.0F, 1.0F, 1.0F) * 2.0F, glm::vec3(0.0F), glm::vec3(0.0F, 1.0F, 0.0F));
-		
+		if (GetKey(GLFW_KEY_SPACE).pressed)
+		{
+			std::cout << "Jump!\n";
+		}
+
+		if (GetKey(GLFW_KEY_SPACE).released)
+		{
+			std::cout << "Jump release!\n";
+		}
 
 		auto model = glm::translate(glm::mat4(1.0F), pos);
 		model = glm::scale(model, scale);
-		//model = glm::rotate(model, rotation, glm::vec3{ 0.0F, 0.0F, 1.0F });
-		//model = glm::rotate(model, glm::radians(90.F * time), { 0.0F, 1.0F, 0.0F });
 
 		auto const MVP = _camera.GetVP() * model;
 		test_shader.SetMat4("u_MVP", MVP);
