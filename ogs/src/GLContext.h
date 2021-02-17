@@ -33,6 +33,7 @@ public:
 	struct WindowUserData
 	{
 		Input* input;
+		Camera* camera;
 		WindowProps* window_props;
 	};
 
@@ -52,13 +53,16 @@ public:
 		return _window_props.GetAspect();
 	}
 
-private:
+protected:
+	virtual void OnUpdate(float) {};
+
+protected:
 	inline auto GetKey(int glfw_key)
 	{
 		return _input.GetKey(glfw_key);
 	}
 
-private:
+protected:
 	GLFWwindow* _window = nullptr;
 	WindowUserData _data;
 	Input _input;

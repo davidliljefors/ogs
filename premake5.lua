@@ -22,6 +22,7 @@ IncludeDir["fmt"] = "ogs/vendor/fmt/include"
 include "ogs/vendor/GLFW"
 include "ogs/vendor/Glad"
 include "ogs/vendor/fmt"
+include "ogs/vendor/imgui"
 
 project "ogs"
 	location "ogs"
@@ -59,6 +60,7 @@ project "ogs"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.fmt}",
+		"%{IncludeDir.ImGui}",
 	}
 
 	links 
@@ -66,6 +68,7 @@ project "ogs"
 		"GLFW",
 		"Glad",
 		"fmt",
+		"ImGui",
 		"opengl32.lib",
 	}
 

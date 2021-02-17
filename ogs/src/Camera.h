@@ -7,9 +7,11 @@ namespace ogs {
 
 class Camera {
 public:
-	Camera(float aspect_ratio)
-		:_position(glm::vec3(0.0F))
-		,_forward(0.0F, 0.0F, -1.0F)
+	Camera(float aspect_ratio, float fov_y) : 
+		_position(glm::vec3(0.0F)),
+		_forward(0.0F, 0.0F, -1.0F),
+		_fov(fov_y),
+		_current_fov(_fov)
 	{
 		SetAspectRatio(aspect_ratio);
 		UpdateMatrix();
@@ -33,6 +35,14 @@ public:
 		_dirty = true;
 	}
 
+	inline void Zoom(float delta)
+	{
+		_current_fov -= delta;
+		_current_fov = std::min(_current_fov, _fov);
+		_current_fov = std::max(_current_fov, MIN_FOV);
+		_dirty = true;
+	}
+
 	inline void Move(glm::vec3 local_move)
 	{
 		auto const up = glm::vec3(0.0F, 1.0F, 0.0F);
@@ -45,7 +55,7 @@ public:
 	inline void SetAspectRatio(float aspect_ratio)
 	{
 		_aspect = aspect_ratio;
-		_projection = glm::perspective(glm::radians(90.0F), _aspect, 0.1F, 100.F);
+		_dirty = true;
 	}
 
 	inline void SetPosition(glm::vec3 const& position)
@@ -67,20 +77,24 @@ public:
 private:
 	inline void UpdateMatrix()
 	{
+		auto const projection = glm::perspective(glm::radians(_current_fov), _aspect, 0.1F, 100.F);
 		auto const view = glm::lookAt(_position, _position+_forward, glm::vec3(0.0F, 1.0F, 0.0F));
-		_view_projection = _projection * view;
+		_view_projection = projection * view;
 	}
 
 private:
-	glm::mat4 _projection;
 	glm::mat4 _view_projection;
 	glm::vec3 _position;
 	glm::vec3 _forward;
 
+	float _fov;
+	float _current_fov;
 	float _aspect;
 	float _yaw = -90.0F;
 	float _pitch = 0.0f;
 	bool _dirty = true;
+
+	static constexpr float MIN_FOV = 10.0F;
 };
 
 }

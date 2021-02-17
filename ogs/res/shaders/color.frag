@@ -15,5 +15,5 @@ void main()
 {
     vec4 col_a = texture(u_Tex0, f_TexCoord);
     vec4 col_b = texture(u_Tex1, f_TexCoord);
-    FragColor = mix(col_a, col_b, sin(u_Time + f_Position.x + f_Position.y ) * 0.5 + 0.5);
+    FragColor = mix(col_a, col_b, sin(u_Time + f_Position.x + f_Position.y ) * 0.5 + 0.5) * u_Color;
 }
