@@ -1,9 +1,9 @@
-#include <Windows.h>
 #include "GLContext.h"
 
-#include <chrono>
-#include <thread>
-
+#include "Shader.h"
+#include "VertexArray.h"
+#include "VertexBufferLayout.h"
+#include "Texture.h"
 
 bool newframe = true;
 
@@ -21,7 +21,7 @@ ogs::GLContext::GLContext(WindowProps window_props)
 	if (!_window)
 	{
 		glfwTerminate();
-		std::cerr << "GLFW : Create Window Error" << std::endl;
+		LogError("GLFW : Create Window Error");
 		std::exit(-1);
 	}
 
@@ -31,7 +31,7 @@ ogs::GLContext::GLContext(WindowProps window_props)
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
-		std::cerr << "GLAD : Failed to initialize GLAD" << std::endl;
+		LogError("GLAD : Failed to initialize GLAD");
 		std::exit(-1);
 	}
 
@@ -97,16 +97,13 @@ ogs::GLContext::GLContext(WindowProps window_props)
 				glfwGetCursorPos(window, &x, &y);
 				return std::make_pair(x, y);
 			}();
-
-			std::cout << "bang!\n" << "mouse pos = {" << mousePos.first << ", " << mousePos.second << "}\n";
 		}
 	};
 
 	glfwSetMouseButtonCallback(_window, MouseButtonCallback);
 
-	auto ScrollCallback = [](GLFWwindow*, double xoffset, double yoffset)
+	auto ScrollCallback = [](GLFWwindow*, double , double )
 	{
-		std::cout << "Scrolled x: " << xoffset << ", y: " << yoffset << ".\n";
 	};
 
 	glfwSetScrollCallback(_window, ScrollCallback);
@@ -120,11 +117,11 @@ ogs::GLContext::GLContext(WindowProps window_props)
 	glfwSetCursorPosCallback(_window, MouseMoveCallback);
 
 	glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSwapInterval(1);
+	glfwSwapInterval(0);
 
 	if (glfwRawMouseMotionSupported())
 	{
-		std::cout << "Raw input enabled\n";
+		LogHint("Raw input enabled");
 		glfwSetInputMode(_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 	}
 
@@ -220,12 +217,12 @@ void ogs::GLContext::Run()
 
 		if (GetKey(GLFW_KEY_SPACE).pressed)
 		{
-			std::cout << "Jump!\n";
+			LogHint("Jump Press!");
 		}
 
 		if (GetKey(GLFW_KEY_SPACE).released)
 		{
-			std::cout << "Jump release!\n";
+			LogHint("Jump Release!");
 		}
 
 		auto model = glm::translate(glm::mat4(1.0F), pos);

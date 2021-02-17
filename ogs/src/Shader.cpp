@@ -2,8 +2,9 @@
 
 #include <sstream>
 #include <fstream>
-#include <iostream>
 #include <memory>
+
+#include "Core.h"
 
 #include "Shader.h"
 
@@ -34,8 +35,8 @@ ogs::Shader::Shader(std::string const& vertex_path,
 
 			auto const error_log = std::make_unique<char[]>(err_log_len);
 			glGetShaderInfoLog(shader, err_log_len, &err_log_len, error_log.get());
-			std::cout << "Failed to compile " << (shader_type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader!\n";
-			std::cerr << error_log.get();
+			LogError("Failed to compile {} shader", (shader_type == GL_VERTEX_SHADER ? "vertex" : "fragment"));
+			LogError(error_log.get());
 		}
 		return shader;
 	};
@@ -71,9 +72,9 @@ unsigned int ogs::Shader::GetUniformLocation(std::string const& name) const
 	auto const location = glGetUniformLocation(program, name.c_str());
 	if (location == -1)
 	{
-		std::cerr << "Warning: uniform '" << name << "' doesn't exist!" << std::endl;
+		LogWarning("Warning: uniform '{}' doesn't exist!", name);
 	}
-
+	
 	uniform_location_cache[name] = location;
 	return location;
 }

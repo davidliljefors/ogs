@@ -6,7 +6,6 @@ workspace "ogs"
 	{
 		"Debug",
 		"Release",
-		"Dist"
 	}
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
@@ -18,9 +17,11 @@ IncludeDir["Glad"] = "ogs/vendor/Glad/include"
 IncludeDir["ImGui"] = "ogs/vendor/imgui"
 IncludeDir["glm"] = "ogs/vendor/glm"
 IncludeDir["stb_image"] = "ogs/vendor/stb_image"
+IncludeDir["fmt"] = "ogs/vendor/fmt/include"
 
 include "ogs/vendor/GLFW"
 include "ogs/vendor/Glad"
+include "ogs/vendor/fmt"
 
 project "ogs"
 	location "ogs"
@@ -57,12 +58,14 @@ project "ogs"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.fmt}",
 	}
 
 	links 
 	{ 
 		"GLFW",
 		"Glad",
+		"fmt",
 		"opengl32.lib",
 	}
 
@@ -83,10 +86,5 @@ project "ogs"
 
 	filter "configurations:Release"
 		defines "OGS_RELEASE"
-		runtime "Release"
-		optimize "on"
-
-	filter "configurations:Dist"
-		defines "OGS_DIST"
 		runtime "Release"
 		optimize "on"

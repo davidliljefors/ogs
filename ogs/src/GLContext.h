@@ -3,15 +3,10 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-#include <iostream>
 #include <utility>
 #include <array>
 
 #include "Input.h"
-#include "Shader.h"
-#include "VertexArray.h"
-#include "VertexBufferLayout.h"
-#include "Texture.h"
 #include "Camera.h"
 
 namespace ogs {
