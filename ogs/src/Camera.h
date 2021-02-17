@@ -8,7 +8,8 @@ namespace ogs {
 class Camera {
 public:
 	Camera(float aspect_ratio)
-		:_position(glm::vec3(0.0F)), _forward(0.0F, 0.0F, -1.0F)
+		:_position(glm::vec3(0.0F))
+		,_forward(0.0F, 0.0F, -1.0F)
 	{
 		SetAspectRatio(aspect_ratio);
 		UpdateMatrix();
@@ -66,7 +67,6 @@ public:
 private:
 	inline void UpdateMatrix()
 	{
-		auto const pos = glm::vec3(0.0F, 0.0F, 1.0F) * 2.0F;
 		auto const view = glm::lookAt(_position, _position+_forward, glm::vec3(0.0F, 1.0F, 0.0F));
 		_view_projection = _projection * view;
 	}
