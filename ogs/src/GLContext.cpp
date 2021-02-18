@@ -163,8 +163,27 @@ void ogs::GLContext::Construct(WindowProps window_props)
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-
+	
 	ImGui::StyleColorsDark();
+	
+	auto screen_dpi_scale = [window = _window]()
+	{
+		float xscale, yscale;
+		int monitor_count;
+		auto monitors = glfwGetMonitors(&monitor_count);
+		glfwGetMonitorContentScale(monitors[0], &xscale, &yscale);
+		return xscale;
+	}();
+
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		style.WindowRounding = 4.0f * screen_dpi_scale;
+		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		style.ScaleAllSizes(screen_dpi_scale);
+		io.Fonts->AddFontFromFileTTF("res/fonts/Verdana.ttf", 18.0f * screen_dpi_scale, nullptr, nullptr);
+	}
 
 	ImGui_ImplGlfw_InitForOpenGL(_window, true);
 	ImGui_ImplOpenGL3_Init("#version 410");
