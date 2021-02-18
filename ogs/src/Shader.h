@@ -12,6 +12,12 @@ class Shader {
 public:
 	Shader(std::string const& vertex_path, std::string const& fragment_path);
 
+	Shader(Shader const&) = delete;
+	Shader& operator=(Shader const&) = delete;
+
+	Shader(Shader&& shader) noexcept;
+	Shader& operator=(Shader&& rhs) noexcept;
+
 	~Shader();
 
 	void Bind() const;
@@ -50,7 +56,7 @@ private:
 	unsigned int GetUniformLocation(std::string const& name) const;
 
 private:
-	unsigned int const program = 0;
+	unsigned int program = 0;
 	mutable std::unordered_map<std::string, unsigned int> uniform_location_cache;
 };
 }

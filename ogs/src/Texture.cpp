@@ -21,9 +21,29 @@ ogs::Texture::Texture(std::string const& texture_path)
 	stbi_image_free(image_data);
 }
 
+ogs::Texture::Texture(Texture&& texture) noexcept
+{
+	std::swap(_id, texture._id);
+	_width = texture._width;
+	_height = texture._height;
+	_channels = texture._channels;
+}
+
+ogs::Texture& ogs::Texture::operator=(Texture&& rhs) noexcept
+{
+	std::swap(_id, rhs._id);
+	_width = rhs._width;
+	_height = rhs._height;
+	_channels = rhs._channels;
+	return *this;
+}
+
 ogs::Texture::~Texture()
 {
-	glDeleteTextures(1, &_id);
+	if (_id)
+	{
+		glDeleteTextures(1, &_id);
+	}
 }
 
 void ogs::Texture::Bind(unsigned int slot) const

@@ -44,9 +44,28 @@ public:
 		glBindVertexArray(_id);
 	}
 
+	VertexArray(VertexArray const&) = delete;
+	VertexArray& operator=(VertexArray const&) = delete;
+
+	VertexArray(VertexArray&& vao) noexcept
+	{
+		std::swap(_id, vao._id);
+		_indices = vao._indices;
+	}
+
+	VertexArray& operator=(VertexArray&& rhs) noexcept
+	{
+		std::swap(_id, rhs._id);
+		_indices = rhs._indices;
+	}
+
+
 	~VertexArray()
 	{
-		glDeleteVertexArrays(1, &_id);
+		if(_id)
+		{
+			glDeleteVertexArrays(1, &_id);
+		}
 	}
 
 	auto Count() const

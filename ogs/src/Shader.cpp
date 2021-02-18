@@ -52,9 +52,26 @@ ogs::Shader::Shader(std::string const& vertex_path,
 	glDeleteShader(vert_shader);
 }
 
+ogs::Shader::Shader(Shader&& shader) noexcept
+{
+	std::swap(program, shader.program);
+	uniform_location_cache = std::move(shader.uniform_location_cache);
+}
+
+ogs::Shader& ogs::Shader::operator=(Shader&& rhs) noexcept
+{
+	std::swap(program, rhs.program);
+	uniform_location_cache = std::move(rhs.uniform_location_cache);
+
+	return *this;
+}
+
 ogs::Shader::~Shader()
 {
-	glDeleteProgram(program);
+	if (program)
+	{
+		glDeleteProgram(program);
+	}
 }
 
 void ogs::Shader::Bind() const
