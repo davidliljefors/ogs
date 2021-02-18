@@ -58,8 +58,7 @@ private:
 				auto const pos = offset + glm::vec3(static_cast<float>(x), static_cast<float>(y), 0.0F);
 
 				auto model = glm::translate(glm::mat4(1.0F), pos);
-				model = glm::scale(model, glm::vec3(1.5F));
-				model = model * model;
+				model = glm::scale(model, glm::vec3(0.95F));
 				model = glm::rotate(model, x / 5.0F + GetTime() , glm::vec3{ 0.0F, 1.0F, 0.0F });
 				default_shader->SetMat4("u_Model", model);
 
@@ -67,6 +66,7 @@ private:
 			}
 		}
 	};
+
 private:
 	glm::vec3 offset{};
 	glm::vec4 tint = glm::vec4(1.0F);
