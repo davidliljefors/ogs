@@ -58,8 +58,6 @@ private:
 	{
 
 		ImGui::Begin("Editor");
-		ImGui::DragFloat3("Offset position", glm::value_ptr(offset));
-		ImGui::ColorEdit4("Tint", glm::value_ptr(tint));
 
 		static std::array<char, 128> filename_buffer;
 		if( ImGui::InputText("Load Obj", filename_buffer.data(), filename_buffer.size(), ImGuiInputTextFlags_EnterReturnsTrue) )
@@ -95,7 +93,6 @@ private:
 		default_shader->Bind();
 		default_shader->SetMat4("u_VP", _camera.GetVP());
 		default_shader->SetFloat("u_Time", GetTime());
-		default_shader->SetFloat4("u_Color", tint);
 
 		for (auto const& mesh : meshes)
 		{
@@ -105,9 +102,6 @@ private:
 	};
 
 private:
-	glm::vec3 offset{};
-	glm::vec4 tint = glm::vec4(1.0F);
-
 	std::unique_ptr<ogs::VertexArray> quad_vao;
 	std::unique_ptr<ogs::Shader> default_shader;
 	std::unique_ptr<ogs::Texture> tex1;
