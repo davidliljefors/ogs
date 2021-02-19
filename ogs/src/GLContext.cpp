@@ -207,7 +207,7 @@ void ogs::GLContext::Run()
 		return delta_time;
 	};
 	
-	_camera.SetPosition(glm::vec3(0.0F, 0.0F, 2.0F));
+	_camera.SetPosition(glm::vec3(0.0F, 0.0F, 5.0F));
 
 	while (!glfwWindowShouldClose(_window))
 	{

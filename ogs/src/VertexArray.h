@@ -1,48 +1,31 @@
 #pragma once
 #include <glad/glad.h>
-#include <array>
+#include <vector>
+#include <glm/glm.hpp>
 
 #include "Core.h"
 #include "VertexBufferLayout.h"
 
 namespace ogs {
 
+struct Vertex
+{
+	glm::vec3 Position{};
+	glm::vec2 TexCoord{};
+	glm::vec3 Normal{};
+};
+
 class VertexArray {
 
 public:
-	template<auto vertex_count, auto index_count>
-	VertexArray(std::array<float, vertex_count> const& vertex_data,
-				std::array<int,   index_count>  const& index_data,
-				VertexBufferLayout const& layout)
-		:_indices(index_count)
-	{
-		auto const buffer = GenGL(glGenBuffers);
-		glBindBuffer(GL_ARRAY_BUFFER, buffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data.data(), GL_STATIC_DRAW);
+	VertexArray() = default;
+	VertexArray(std::vector<float> const& vertex_data,
+				std::vector<int>   const& index_data,
+				VertexBufferLayout const& layout);
 
-		glGenVertexArrays(1, &_id);
-		glBindVertexArray(_id);
+	VertexArray(std::vector<Vertex> const& vertex_data,
+		VertexBufferLayout const& layout);
 
-		{
-			auto const& elements = layout.GetElements();
-			std::ptrdiff_t offset = 0;
-			for (auto i = 0; i < elements.size(); ++i)
-			{
-				auto const& element = elements[i];
-				glEnableVertexAttribArray(i);
-				glVertexAttribPointer(i, element.count, element.type,
-					element.normalized, layout.GetStride(), (const void*)offset);
-
-				offset += element.count * VertexBufferElement::GetSizeOfType(element.type);
-			}
-		}
-
-		auto const ebo = GenGL(glGenBuffers);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_data), index_data.data(), GL_STATIC_DRAW);
-
-		glBindVertexArray(_id);
-	}
 
 	VertexArray(VertexArray const&) = delete;
 	VertexArray& operator=(VertexArray const&) = delete;
@@ -50,15 +33,15 @@ public:
 	VertexArray(VertexArray&& vao) noexcept
 	{
 		std::swap(_id, vao._id);
-		_indices = vao._indices;
+		_count = vao._count;
 	}
 
 	VertexArray& operator=(VertexArray&& rhs) noexcept
 	{
 		std::swap(_id, rhs._id);
-		_indices = rhs._indices;
+		_count = rhs._count;
+		return *this;
 	}
-
 
 	~VertexArray()
 	{
@@ -70,7 +53,7 @@ public:
 
 	auto Count() const
 	{
-		return _indices;
+		return _count;
 	}
 
 	void Bind() const
@@ -78,8 +61,11 @@ public:
 		glBindVertexArray(_id);
 	}
 
+	auto IsIndexed() const { return _using_index_buffer; }
+
 private:
-	unsigned int _id;
-	unsigned int _indices;
+	bool _using_index_buffer = false;
+	unsigned int _id = 0;
+	unsigned int _count = 0;
 };
 }

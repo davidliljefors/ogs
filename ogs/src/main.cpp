@@ -3,20 +3,23 @@
 
 #include "imgui.h"
 
+#include "temp/Mesh.h"
+#include "Transform.h"
+
 
 class Game : public ogs::GLContext
 {
 private:
 	void OnConstruct() override
 	{
-		std::array const quad_vertex_data = {
+		std::vector const quad_vertex_data = {
 		-0.5F,  0.5F,  0.0F,  1.0F,
 		 0.5F,  0.5F,  1.0F,  1.0F,
 		 0.5F, -0.5F,  1.0F,  0.0F,
 		-0.5F, -0.5F,  0.0F,  0.0F,
 		};
 
-		std::array const quad_idx_data = {
+		std::vector const quad_idx_data = {
 			0, 1, 2,
 			0, 2, 3,
 		};
@@ -36,6 +39,19 @@ private:
 		default_shader->Bind();
 		default_shader->SetInt("u_Tex0", 0);
 		default_shader->SetInt("u_Tex1", 1);
+
+		if (auto const obj_file = wavefront_load("res/meshes/Cube.obj"))
+		{
+			auto cube = std::make_unique<ogs::Mesh>(obj_file.value());
+			meshes.emplace_back(ogs::Transform(), std::move(cube));
+		}
+
+		if (auto const obj_file = wavefront_load("res/meshes/Monkey.obj"))
+		{
+			auto monke = std::make_unique<ogs::Mesh>(obj_file.value());
+			meshes.emplace_back(ogs::Transform(), std::move(monke));
+		}
+
 	}
 
 	void OnUpdate(float) override
@@ -44,26 +60,47 @@ private:
 		ImGui::Begin("Editor");
 		ImGui::DragFloat3("Offset position", glm::value_ptr(offset));
 		ImGui::ColorEdit4("Tint", glm::value_ptr(tint));
+
+		static std::array<char, 128> filename_buffer;
+		if( ImGui::InputText("Load Obj", filename_buffer.data(), filename_buffer.size(), ImGuiInputTextFlags_EnterReturnsTrue) )
+		{
+			ogs::LogHint("Loading obj file '{}'", filename_buffer.data());
+			if (auto const obj_file = wavefront_load(filename_buffer.data()))
+			{
+				auto monke = std::make_unique<ogs::Mesh>(obj_file.value());
+				meshes.emplace_back(ogs::Transform(), std::move(monke));
+			}
+		}
 		ImGui::End();
+
+		ImGui::BeginChild("Objects");
+		if (ImGui::TreeNode("Scene"))
+		{
+			ImGui::Indent();
+			for (int i = 0; i < meshes.size(); ++i)
+			{
+				if (ImGui::TreeNode(fmt::format("Object {} transform", i).c_str()))
+				{
+					if (ImGui::DragFloat3("Position", glm::value_ptr(meshes[i].first.Position), 0.1F)) { meshes[i].first.Invalidate(); }
+					if (ImGui::DragFloat3("Rotation", glm::value_ptr(meshes[i].first.Rotation), 0.5F)) { meshes[i].first.Invalidate(); }
+					if (ImGui::DragFloat3("Scale", glm::value_ptr(meshes[i].first.Scale), 0.1F)) { meshes[i].first.Invalidate(); }
+					ImGui::TreePop();
+				}
+			}
+			ImGui::TreePop();
+		}
+		ImGui::EndChild();
+
 
 		default_shader->Bind();
 		default_shader->SetMat4("u_VP", _camera.GetVP());
 		default_shader->SetFloat("u_Time", GetTime());
 		default_shader->SetFloat4("u_Color", tint);
 
-		for (int y = -10; y < 10; ++y)
+		for (auto const& mesh : meshes)
 		{
-			for (int x = -10; x < 10; ++x)
-			{
-				auto const pos = offset + glm::vec3(static_cast<float>(x), static_cast<float>(y), 0.0F);
-
-				auto model = glm::translate(glm::mat4(1.0F), pos);
-				model = glm::scale(model, glm::vec3(0.95F));
-				model = glm::rotate(model, x / 5.0F + GetTime() , glm::vec3{ 0.0F, 1.0F, 0.0F });
-				default_shader->SetMat4("u_Model", model);
-
-				ogs::Renderer::Submit(*quad_vao);
-			}
+			default_shader->SetMat4("u_Model", mesh.first.Mat4());
+			ogs::Renderer::Submit(*mesh.second);
 		}
 	};
 
@@ -75,6 +112,8 @@ private:
 	std::unique_ptr<ogs::Shader> default_shader;
 	std::unique_ptr<ogs::Texture> tex1;
 	std::unique_ptr<ogs::Texture> tex2;
+
+	std::vector<std::pair<ogs::Transform, std::unique_ptr<ogs::Mesh>>> meshes;
 };
 
 int main()
