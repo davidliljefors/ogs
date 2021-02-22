@@ -3,24 +3,6 @@
 #include <fstream>
 
 
-//static glm::vec3 parse_vec3(const char* line)
-//{
-//	glm::vec3 result;
-//
-//	// Offset by 2 to skip 'v', 'vf', or 'vn'
-//	sscanf_s(line + 2, "%f %f %f", &result.x, &result.y, &result.z);
-//	return result;
-//}
-//
-//static glm::vec2 parse_vec2(const char* line)
-//{
-//	glm::vec2 result;
-//
-//	// Offset by 2 to skip 'v', 'vf', or 'vn'
-//	sscanf_s(line + 2, "%f %f", &result.x, &result.y);
-//	return result;
-//}
-
 static bool parse_vertex_and_jump(char** str, Wavefront_Vertex* vert)
 {
 	// nullptr or null character
@@ -40,7 +22,7 @@ static bool parse_vertex_and_jump(char** str, Wavefront_Vertex* vert)
 	return true;
 }
 
-std::optional<Wavefront_File> wavefront_load(std::string const& path)
+std::unique_ptr<Wavefront_File> wavefront_load(std::string const& path)
 {
 	// Open file
 	std::ifstream file;
@@ -49,7 +31,7 @@ std::optional<Wavefront_File> wavefront_load(std::string const& path)
 	if (!file)
 	{
 		ogs::LogError("Cannot open model '{}'.", path);
-		return {};
+		return nullptr;
 	}
 
 	Wavefront_File wav;
@@ -157,5 +139,5 @@ std::optional<Wavefront_File> wavefront_load(std::string const& path)
 	}
 
 	// Done :)
-	return wav;
+	return std::make_unique<Wavefront_File>(wav);
 }

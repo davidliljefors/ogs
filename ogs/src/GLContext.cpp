@@ -272,7 +272,7 @@ void ogs::GLContext::Run()
 			ImGui::RenderPlatformWindowsDefault();
 			glfwMakeContextCurrent(backup_current_context);
 		}
-
+		_assetlib.Maintain();
 		_input.Update();
 		glfwPollEvents();
 		glfwSwapBuffers(_window);

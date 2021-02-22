@@ -3,6 +3,7 @@
 
 #include "Input.h"
 #include "Camera.h"
+#include "AssetLibrary.h"
 
 namespace ogs {
 	
@@ -71,6 +72,8 @@ protected:
 	WindowProps _window_props = DefaultWindowProp;
 	Camera _camera = { DefaultWindowProp.GetAspect(), 90.0F };
 	float _mouse_sensitivity = 0.07F;
+
+	AssetLibrary _assetlib;
 
 private:
 	bool initialized = false;

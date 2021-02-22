@@ -32,26 +32,13 @@ private:
 		default_shader = std::make_unique<ogs::Shader>("res/shaders/color.vert", "res/shaders/color.frag");
 
 		tex1 = std::make_unique<ogs::Texture>("res/textures/very_nice_texture.png");
-		tex2 = std::make_unique<ogs::Texture>("res/textures/cool_texture.png");
+		tex2 = std::make_unique<ogs::Texture>("res/textures/T_Telescope_D.png");
 		tex1->Bind(0);
 		tex2->Bind(1);
 
 		default_shader->Bind();
 		default_shader->SetInt("u_Tex0", 0);
 		default_shader->SetInt("u_Tex1", 1);
-
-		if (auto const obj_file = wavefront_load("res/meshes/Cube.obj"))
-		{
-			auto cube = std::make_unique<ogs::Mesh>(obj_file.value());
-			meshes.emplace_back(ogs::Transform(), std::move(cube));
-		}
-
-		if (auto const obj_file = wavefront_load("res/meshes/Monkey.obj"))
-		{
-			auto monke = std::make_unique<ogs::Mesh>(obj_file.value());
-			meshes.emplace_back(ogs::Transform(), std::move(monke));
-		}
-
 	}
 
 	void OnUpdate(float) override
@@ -59,15 +46,20 @@ private:
 
 		ImGui::Begin("Editor");
 
+		if (ImGui::Button("Reload shader"))
+		{
+			default_shader = std::make_unique<ogs::Shader>("res/shaders/color.vert", "res/shaders/color.frag");
+			default_shader->Bind();
+		}
+
 		static std::array<char, 128> filename_buffer;
 		if( ImGui::InputText("Load Obj", filename_buffer.data(), filename_buffer.size(), ImGuiInputTextFlags_EnterReturnsTrue) )
 		{
 			ogs::LogHint("Loading obj file '{}'", filename_buffer.data());
-			if (auto const obj_file = wavefront_load(filename_buffer.data()))
-			{
-				auto monke = std::make_unique<ogs::Mesh>(obj_file.value());
-				meshes.emplace_back(ogs::Transform(), std::move(monke));
-			}
+			_assetlib.GetMesh(filename_buffer.data(), [&](ogs::Mesh* mesh)
+				{
+					meshes.emplace_back(ogs::Transform(), mesh);
+				});
 		}
 		ImGui::End();
 
@@ -107,7 +99,7 @@ private:
 	std::unique_ptr<ogs::Texture> tex1;
 	std::unique_ptr<ogs::Texture> tex2;
 
-	std::vector<std::pair<ogs::Transform, std::unique_ptr<ogs::Mesh>>> meshes;
+	std::vector<std::pair<ogs::Transform, ogs::Mesh*>> meshes;
 };
 
 int main()
@@ -115,6 +107,5 @@ int main()
 	Game game;
 	game.Construct({ 1600, 900 });
 	game.Run();
-
 	return 0;
 }

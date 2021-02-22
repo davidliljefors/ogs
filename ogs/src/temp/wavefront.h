@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include <optional>
+#include <memory>
 
 struct Wavefront_Vertex
 {
@@ -25,4 +25,4 @@ struct Wavefront_File
 	std::vector<Wavefront_Triangle> triangles;
 };
 
-std::optional<Wavefront_File> wavefront_load(std::string const& path);
+std::unique_ptr<Wavefront_File> wavefront_load(std::string const& path);
