@@ -1,6 +1,21 @@
+#include "ogspch.h"
 #include "Renderer.h"
 
-void ogs::Renderer::Submit(VertexArray const& vao)
+ogs::Shader const* current_shader = nullptr;
+
+void ogs::Renderer::BeginScene(Camera const& camera)
+{
+	assert(current_shader && "No shader bound");
+	current_shader->Bind();
+	current_shader->SetMat4("u_VP", camera.GetVP());
+}
+
+void ogs::Renderer::UseShader(Shader const& shader)
+{
+	current_shader = &shader;
+}
+
+void ogs::Renderer::Draw(VertexArray const& vao)
 {
 	vao.Bind();
 	if (vao.IsIndexed())
@@ -13,7 +28,17 @@ void ogs::Renderer::Submit(VertexArray const& vao)
 	}
 }
 
-void ogs::Renderer::Submit(Mesh const& mesh)
+void ogs::Renderer::Draw(Mesh const& mesh)
 {
-	Renderer::Submit(mesh._vao);
+	Renderer::Draw(mesh._vao);
+}
+
+void ogs::Renderer::Draw(Mesh const& mesh, glm::mat4 const& model)
+{
+	current_shader->SetMat4("u_Model", model);
+	for (int i = 0; i < mesh._textures.size(); ++i)
+	{
+		mesh._textures[i]->Bind(i);
+	}
+	Renderer::Draw(mesh._vao);
 }

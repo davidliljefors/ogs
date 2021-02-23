@@ -1,5 +1,4 @@
 #pragma once
-#include <glad/glad.h>
 #include <vector>
 #include <glm/glm.hpp>
 
@@ -43,23 +42,14 @@ public:
 		return *this;
 	}
 
-	~VertexArray()
-	{
-		if(_id)
-		{
-			glDeleteVertexArrays(1, &_id);
-		}
-	}
+	~VertexArray();
 
 	auto Count() const
 	{
 		return _count;
 	}
 
-	void Bind() const
-	{
-		glBindVertexArray(_id);
-	}
+	void Bind() const;
 
 	auto IsIndexed() const { return _using_index_buffer; }
 

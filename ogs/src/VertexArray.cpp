@@ -1,4 +1,6 @@
+#include "ogspch.h"
 #include "VertexArray.h"
+
 
 ogs::VertexArray::VertexArray(std::vector<float> const& vertex_data,
 							  std::vector<int> const& index_data, 
@@ -62,5 +64,18 @@ ogs::VertexArray::VertexArray(std::vector<Vertex> const& vertex_data,
 
 	glBindVertexArray(_id);
 	_using_index_buffer = false;
+}
+
+ogs::VertexArray::~VertexArray()
+{
+	if (_id)
+	{
+		glDeleteVertexArrays(1, &_id);
+	}
+}
+
+void ogs::VertexArray::Bind() const
+{
+	glBindVertexArray(_id);
 }
 

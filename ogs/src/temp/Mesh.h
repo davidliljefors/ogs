@@ -7,6 +7,7 @@
 #include "wavefront.h"
 
 namespace ogs {
+class Texture;
 
 class Mesh {
 	friend class Renderer;
@@ -37,6 +38,7 @@ public:
 private:
 	std::vector<Vertex> _vertices;
 	std::vector<int> _indices;
+	std::vector<Texture*> _textures;
 	VertexArray _vao;
 };
 

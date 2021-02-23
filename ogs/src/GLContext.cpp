@@ -1,9 +1,8 @@
+#include "ogspch.h"
 #include "GLContext.h"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
-
-#include <array>
 
 #include "Renderer.h"
 
@@ -210,7 +209,9 @@ void ogs::GLContext::Run()
 		last_time = glfwGetTime();
 		return delta_time;
 	};
-	
+
+	_default_shader = std::make_unique<Shader>("res/shaders/default.vert", "res/shaders/default.frag");
+	Renderer::UseShader(*_default_shader);
 	_camera.SetPosition(glm::vec3(0.0F, 0.0F, 5.0F));
 
 	while (!glfwWindowShouldClose(_window))
@@ -231,12 +232,12 @@ void ogs::GLContext::Run()
 			auto camera_movement = glm::vec3(0.0F);
 			if (GetKey(GLFW_KEY_W).held)
 			{
-				camera_movement.y = 1.0F;
+				camera_movement.z = 1.0F;
 			}
 
 			if (GetKey(GLFW_KEY_S).held)
 			{
-				camera_movement.y = -1.0F;
+				camera_movement.z = -1.0F;
 			}
 			if (GetKey(GLFW_KEY_A).held)
 			{
@@ -248,9 +249,23 @@ void ogs::GLContext::Run()
 				camera_movement.x = -1.0F;
 			}
 
+			if (GetKey(GLFW_KEY_Q).held)
+			{
+				camera_movement.y = 1.0F;
+			}
+
+			if (GetKey(GLFW_KEY_Z).held)
+			{
+				camera_movement.y = -1.0F;
+			}
+
 			if (camera_movement.length() > 0.01F)
 			{
-				_camera.Move(camera_movement * 5.0F * dt);
+				if(GetKey(GLFW_KEY_LEFT_SHIFT).held)
+					_camera.Move(camera_movement * 25.0F * dt);
+				else
+					_camera.Move(camera_movement * 5.0F * dt);
+
 			}
 		}
 		
@@ -259,6 +274,7 @@ void ogs::GLContext::Run()
 		ImGui::NewFrame();
 
 		// User Update Loop
+		Renderer::BeginScene(_camera);
 		OnUpdate(dt);
 		
 
@@ -276,7 +292,7 @@ void ogs::GLContext::Run()
 			ImGui::RenderPlatformWindowsDefault();
 			glfwMakeContextCurrent(backup_current_context);
 		}
-		_assetlib.Maintain();
+		assets.Maintain();
 		_input.Update();
 		glfwPollEvents();
 		glfwSwapBuffers(_window);

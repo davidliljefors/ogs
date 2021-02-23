@@ -1,10 +1,6 @@
+#include "ogspch.h"
+
 #include <glad/glad.h>
-
-#include <sstream>
-#include <fstream>
-#include <memory>
-
-#include "Core.h"
 
 #include "Shader.h"
 
@@ -77,6 +73,36 @@ ogs::Shader::~Shader()
 void ogs::Shader::Bind() const
 {
 	glUseProgram(program);
+}
+
+void ogs::Shader::SetInt(std::string const& name, int value) const
+{
+	auto const location = GetUniformLocation(name);
+	glUniform1i(location, value);
+}
+
+void ogs::Shader::SetFloat(std::string const& name, float value) const
+{
+	auto const location = GetUniformLocation(name);
+	glUniform1f(location, value);
+}
+
+void ogs::Shader::SetFloat3(std::string const& name, glm::vec3 const& value) const
+{
+	auto const location = GetUniformLocation(name);
+	glUniform3fv(location, 1, glm::value_ptr(value));
+}
+
+void ogs::Shader::SetFloat4(std::string const& name, glm::vec4 const& value) const
+{
+	auto const location = GetUniformLocation(name);
+	glUniform4fv(location, 1, glm::value_ptr(value));
+}
+
+void ogs::Shader::SetMat4(std::string const& name, glm::mat4 const& value) const
+{
+	auto const location = GetUniformLocation(name);
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }
 
 unsigned int ogs::Shader::GetUniformLocation(std::string const& name) const

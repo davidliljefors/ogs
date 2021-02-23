@@ -1,7 +1,5 @@
+#include "ogspch.h"
 #include "wavefront.h"
-#include <Core.h>
-#include <fstream>
-
 
 static bool parse_vertex_and_jump(char** str, Wavefront_Vertex* vert)
 {

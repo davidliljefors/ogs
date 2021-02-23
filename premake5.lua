@@ -37,6 +37,9 @@ project "ogs"
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+	pchheader "ogspch.h"
+	pchsource "ogs/src/ogspch.cpp"
+
 	files
 	{
 		"%{prj.name}/src/**.h",

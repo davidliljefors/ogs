@@ -1,6 +1,5 @@
+#include "ogspch.h"
 #include "Texture.h"
-#include "Core.h"
-
 
 ogs::Texture::Texture(std::string const& texture_path)
 	:_id(GenGL(glGenTextures))

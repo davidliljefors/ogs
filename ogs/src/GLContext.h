@@ -3,6 +3,7 @@
 
 #include "Input.h"
 #include "Camera.h"
+#include "Shader.h"
 #include "AssetLibrary.h"
 
 namespace ogs {
@@ -73,9 +74,10 @@ protected:
 	Camera _camera = { DefaultWindowProp.GetAspect(), 90.0F };
 	float _mouse_sensitivity = 0.07F;
 
-	AssetLibrary _assetlib;
+	AssetLibrary assets;
 
 private:
+	std::unique_ptr<Shader> _default_shader;
 	bool initialized = false;
 };
 }

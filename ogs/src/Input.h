@@ -2,6 +2,7 @@
 
 #include <GLFW/glfw3.h>
 #include <array>
+#include <glm/glm.hpp>
 
 namespace ogs {
 
@@ -9,35 +10,9 @@ class Input {
 
 public:
 
-	inline void Update()
-	{
-		_mouse_delta = glm::vec2(0.0F);
+	void Update();
 
-		for (auto& key_sate : _keys)
-		{
-			key_sate.pressed = false;
-			key_sate.released = false;
-		}
-
-		for (auto& mouse_state : _mouse_buttons)
-		{
-			mouse_state.pressed = false;
-			mouse_state.released = false;
-		}
-	}
-
-	inline void MouseMove(float x, float y)
-	{
-		auto const mouse_pos = glm::vec2(x, y);
-		if (_first_mouse)
-		{
-			_last_mouse_pos = mouse_pos;
-			_first_mouse = false;
-		}
-
-		_mouse_delta += (mouse_pos - _last_mouse_pos);
-		_last_mouse_pos = mouse_pos;
-	}
+	void MouseMove(float x, float y);
 
 	inline auto GetMouseDelta() const
 	{
@@ -49,39 +24,9 @@ public:
 		return _last_mouse_pos;
 	}
 
-	void KeyEvent(int key, int action)
-	{
-		if (action == GLFW_PRESS)
-		{
-			_keys[key].pressed = true;
-			_keys[key].held = true;
-			return;
-		}
+	void KeyEvent(int key, int action);
 
-		if (action == GLFW_RELEASE)
-		{
-			_keys[key].held = false;
-			_keys[key].released = true;
-			return;
-		}
-	};
-
-	void MouseEvent(int button, int action)
-	{
-		if (action == GLFW_PRESS)
-		{
-			_mouse_buttons[button].pressed = true;
-			_mouse_buttons[button].held = true;
-			return;
-		}
-
-		if (action == GLFW_RELEASE)
-		{
-			_mouse_buttons[button].held = false;
-			_mouse_buttons[button].released = true;
-			return;
-		}
-	}
+	void MouseEvent(int button, int action);
 
 	auto GetKey(int key)
 	{

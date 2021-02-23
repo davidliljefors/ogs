@@ -1,7 +1,19 @@
+#include "ogspch.h"
 #include "AssetLibrary.h"
-#include <ranges>
 
-void ogs::AssetLibrary::GetMesh(std::string const& path, MeshLoadedCallback&& callback)
+
+ogs::Texture* ogs::AssetLibrary::GetTexture(std::string const& path)
+{
+	if (_loaded_textures.contains(path))
+	{
+		return _loaded_textures[path].get();
+	}
+
+	_loaded_textures.emplace(path, std::make_unique<Texture>(path));
+	return _loaded_textures[path].get();
+}
+
+void ogs::AssetLibrary::GetMeshAsync(std::string const& path, MeshLoadedCallback&& callback)
 {
 	if (_loaded_meshes.contains(path))
 	{
@@ -19,7 +31,6 @@ void ogs::AssetLibrary::GetMesh(std::string const& path, MeshLoadedCallback&& ca
 		{
 			task->OnLoaded.push_back(std::move(callback));
 		}
-		LogHint("Loading mesh '{}' is currently being loaded.", path);
 		return;
 	}
 
