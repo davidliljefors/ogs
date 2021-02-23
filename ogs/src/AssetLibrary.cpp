@@ -38,6 +38,8 @@ void ogs::AssetLibrary::GetMesh(std::string const& path, MeshLoadedCallback&& ca
 	_mesh_queue.emplace_back(path, std::move(future), std::move(callbacks));
 }
 
+
+// Maintain is called in engine thread to synchronize threads with openGL. 
 void ogs::AssetLibrary::Maintain()
 {
 	while (!_finished_tasks.empty())
@@ -55,14 +57,15 @@ void ogs::AssetLibrary::Maintain()
 			LogError("Object file was invalid after finishing load");
 			return;
 		}
+
 		_loaded_meshes.emplace(task->Name, std::make_unique<Mesh>(*obj_file));
 		for (auto&& callback : task->OnLoaded)
 		{
 			callback(_loaded_meshes[task->Name].get());
 		}
+
 		_currently_loading.erase(task->Name);
 		_mesh_queue.erase(task);
-		//std::erase_if(_mesh_queue, [&task = task](auto& item) {return item.Name == task->Name; });
 		_finished_tasks.pop_front();
 	}
 }

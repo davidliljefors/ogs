@@ -2,7 +2,6 @@
 
 #include <unordered_map>
 #include <string>
-#include <atomic>
 #include <set>
 #include <future>
 #include <memory>
