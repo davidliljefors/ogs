@@ -42,7 +42,7 @@ std::unique_ptr<Wavefront_File> wavefront_load(std::string const& path)
 	int num_normals = 0;
 	int num_triangles = 0;
 
-	static char buffer[512];
+	char buffer[512];
 	while(file.getline(buffer, 512))
 	{
 		// Position

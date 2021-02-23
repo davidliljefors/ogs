@@ -23,6 +23,13 @@ public:
 		_deque.push_back(std::move(val));
 	}
 
+	template<typename... Ts>
+	void emplace_back(Ts&&... args)
+	{
+		std::unique_lock lock(_mutex);
+		_deque.emplace_back(std::forward<Ts>(args)...);
+	}
+
 	void push_back(T const& val)
 	{
 		std::unique_lock lock(_mutex);
