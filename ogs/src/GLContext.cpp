@@ -39,7 +39,7 @@ void ogs::GLContext::Construct(WindowProps window_props)
 
 	glfwSwapInterval(1);
 
-	glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 	if (glfwRawMouseMotionSupported())
 	{
@@ -55,7 +55,6 @@ void ogs::GLContext::Construct(WindowProps window_props)
 
 	glEnable(GL_DEPTH_TEST);
 	initialized = true;
-
 	
 	// Setup callback funcs
 	{ 
@@ -73,6 +72,9 @@ void ogs::GLContext::Construct(WindowProps window_props)
 
 		auto KeypressCallback = [](GLFWwindow* window, int key, int, int action, int mods)
 		{
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.WantCaptureKeyboard)
+				return;
 			auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer(window));
 			assert(user_data && "Window User Pointer should not be null!");
 
@@ -85,14 +87,7 @@ void ogs::GLContext::Construct(WindowProps window_props)
 
 			if (key == GLFW_KEY_ESCAPE)
 			{
-				if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL)
-				{
-					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-				}
-				else
-				{
-					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-				}
+				glfwSetWindowShouldClose(window, true);
 				return;
 			}
 
@@ -118,18 +113,20 @@ void ogs::GLContext::Construct(WindowProps window_props)
 
 		auto MouseButtonCallback = [](GLFWwindow* window, int button, int action, int)
 		{
-			if (action != GLFW_PRESS)
-			{
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.WantCaptureMouse)
 				return;
-			}
+			auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer(window));
+			assert(user_data && "Window User Pointer should not be null!");
+			user_data->input->MouseEvent(button, action);
 
-			if (button == GLFW_MOUSE_BUTTON_1)
+			if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 			{
-				auto const mousePos = [&]() {
-					double x, y;
-					glfwGetCursorPos(window, &x, &y);
-					return std::make_pair(x, y);
-				}();
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			}
+			else if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+			{
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 			}
 		};
 
@@ -137,8 +134,12 @@ void ogs::GLContext::Construct(WindowProps window_props)
 
 		auto ScrollCallback = [](GLFWwindow* window, double, double yoffset)
 		{
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.WantCaptureMouse)
+				return;
 			auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer(window));
 			assert(user_data && "Window User Pointer should not be null!");
+
 			user_data->camera->Zoom(static_cast<float>(yoffset));
 		};
 
@@ -146,6 +147,9 @@ void ogs::GLContext::Construct(WindowProps window_props)
 
 		auto MouseMoveCallback = [](GLFWwindow* window, double xpos, double ypos)
 		{
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.WantCaptureMouse)
+				return;
 			auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer(window));
 			user_data->input->MouseMove(static_cast<float>(xpos), static_cast<float>(ypos));
 		};
@@ -246,7 +250,7 @@ void ogs::GLContext::Run()
 
 			if (camera_movement.length() > 0.01F)
 			{
-				_camera.Move(camera_movement * 3.0F * dt);
+				_camera.Move(camera_movement * 5.0F * dt);
 			}
 		}
 		
@@ -264,7 +268,7 @@ void ogs::GLContext::Run()
 		// Rendering
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+		
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
 			GLFWwindow* backup_current_context = glfwGetCurrentContext();

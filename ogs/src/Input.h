@@ -18,6 +18,12 @@ public:
 			key_sate.pressed = false;
 			key_sate.released = false;
 		}
+
+		for (auto& mouse_state : _mouse_buttons)
+		{
+			mouse_state.pressed = false;
+			mouse_state.released = false;
+		}
 	}
 
 	inline void MouseMove(float x, float y)
@@ -60,6 +66,23 @@ public:
 		}
 	};
 
+	void MouseEvent(int button, int action)
+	{
+		if (action == GLFW_PRESS)
+		{
+			_mouse_buttons[button].pressed = true;
+			_mouse_buttons[button].held = true;
+			return;
+		}
+
+		if (action == GLFW_RELEASE)
+		{
+			_mouse_buttons[button].held = false;
+			_mouse_buttons[button].released = true;
+			return;
+		}
+	}
+
 	auto GetKey(int key)
 	{
 		return _keys[key];
@@ -77,6 +100,7 @@ private:
 	};
 
 	std::array<KeyState, GLFW_KEY_LAST> _keys {};
+	std::array<KeyState, GLFW_MOUSE_BUTTON_LAST> _mouse_buttons {};
 	glm::vec2 _last_mouse_pos = glm::vec2(0.0F);
 	glm::vec2 _mouse_delta = glm::vec2(0.0F);
 

@@ -32,9 +32,21 @@ private:
 		default_shader = std::make_unique<ogs::Shader>("res/shaders/color.vert", "res/shaders/color.frag");
 
 		tex1 = std::make_unique<ogs::Texture>("res/textures/very_nice_texture.png");
-		tex2 = std::make_unique<ogs::Texture>("res/textures/T_Telescope_D.png");
+		//tex2 = std::make_unique<ogs::Texture>("res/textures/T_Telescope_D.png");
 		tex1->Bind(0);
-		tex2->Bind(1);
+		//tex2->Bind(1);
+
+		for (int j = 0; j < 10; ++j)
+		{
+			for (int i = 0; i < 10; ++i)
+			{
+				_assetlib.GetMesh("res/meshes/sphere.obj", [&meshes = meshes, i=i, j=j](ogs::Mesh* mesh)
+					{
+						meshes.emplace_back(glm::vec3(i * 3.0F, 0.0F, j * 3.0F), mesh);
+					});
+
+			}
+		}
 
 		default_shader->Bind();
 		default_shader->SetInt("u_Tex0", 0);

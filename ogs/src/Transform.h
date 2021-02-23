@@ -8,6 +8,7 @@ namespace ogs {
 struct Transform
 {
 	Transform() = default;
+	Transform(glm::vec3 const& position) : Position(position) {};
 
 	void Invalidate() { _dirty = true; }
 
@@ -31,8 +32,8 @@ struct Transform
 	glm::vec3 Rotation {0.0F};
 	glm::vec3 Scale { 1.0F };
 private:
-	mutable glm::mat4 _matrix;
 	mutable bool _dirty = true;
+	mutable glm::mat4 _matrix{1.0F};
 };
 
 }
