@@ -191,6 +191,9 @@ void ogs::GLContext::Construct(WindowProps window_props)
 	ImGui_ImplGlfw_InitForOpenGL(_window, true);
 	ImGui_ImplOpenGL3_Init("#version 410");
 
+	_default_shader = std::make_unique<Shader>("res/shaders/default.vert", "res/shaders/default.frag");
+	Renderer::UseShader(*_default_shader);
+
 	OnConstruct();
 }
 
@@ -210,8 +213,6 @@ void ogs::GLContext::Run()
 		return delta_time;
 	};
 
-	_default_shader = std::make_unique<Shader>("res/shaders/default.vert", "res/shaders/default.frag");
-	Renderer::UseShader(*_default_shader);
 	_camera.SetPosition(glm::vec3(0.0F, 0.0F, 5.0F));
 
 	while (!glfwWindowShouldClose(_window))

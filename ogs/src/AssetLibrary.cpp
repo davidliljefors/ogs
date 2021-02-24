@@ -13,6 +13,17 @@ ogs::Texture* ogs::AssetLibrary::GetTexture(std::string const& path)
 	return _loaded_textures[path].get();
 }
 
+ogs::Mesh* ogs::AssetLibrary::GetMesh(std::string const& path)
+{
+	if (_loaded_meshes.contains(path))
+	{
+		return _loaded_meshes[path].get();
+	}
+	auto obj_file = wavefront_load(path);
+	_loaded_meshes.emplace(path, std::make_unique<Mesh>(*obj_file));
+	return _loaded_meshes[path].get();
+}
+
 void ogs::AssetLibrary::GetMeshAsync(std::string const& path, MeshLoadedCallback&& callback)
 {
 	if (_loaded_meshes.contains(path))

@@ -22,6 +22,8 @@ public:
 
 	glm::mat4 const& GetVP() const;
 
+	auto const& GetPosition() const { return _position; }
+
 private:
 	void UpdateMatrix() const;
 

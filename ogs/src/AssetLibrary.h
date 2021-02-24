@@ -28,6 +28,8 @@ class AssetLibrary {
 
 public:
 	Texture* GetTexture(std::string const& path);
+	Mesh* GetMesh(std::string const& path);
+
 	void GetMeshAsync(std::string const& path, MeshLoadedCallback&& on_loaded);
 
 private:

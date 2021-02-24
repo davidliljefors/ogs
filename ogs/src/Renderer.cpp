@@ -36,9 +36,11 @@ void ogs::Renderer::Draw(Mesh const& mesh)
 void ogs::Renderer::Draw(Mesh const& mesh, glm::mat4 const& model)
 {
 	current_shader->SetMat4("u_Model", model);
-	for (int i = 0; i < mesh._textures.size(); ++i)
-	{
-		mesh._textures[i]->Bind(i);
-	}
 	Renderer::Draw(mesh._vao);
+}
+
+void ogs::Renderer::Draw(Mesh const& mesh, Material const& material, glm::mat4 const& model)
+{
+	material.Bind(*current_shader);
+	Draw(mesh, model);
 }

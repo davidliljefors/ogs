@@ -60,7 +60,6 @@ protected:
 	virtual void OnConstruct() {};
 	virtual void OnUpdate(float) {};
 
-protected:
 	inline auto GetKey(int glfw_key)
 	{
 		return _input.GetKey(glfw_key);

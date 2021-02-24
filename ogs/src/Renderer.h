@@ -4,6 +4,7 @@
 #include "VertexBufferLayout.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Material.h"
 #include "Camera.h"
 #include "temp/Mesh.h"
 
@@ -19,6 +20,7 @@ public:
 	static void Draw(VertexArray const& vao);
 	static void Draw(Mesh const& mesh);
 	static void Draw(Mesh const& mesh, glm::mat4 const& model);
+	static void Draw(Mesh const& mesh, Material const& material, glm::mat4 const& model);
 };
 
 }
