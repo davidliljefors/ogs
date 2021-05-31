@@ -7,12 +7,12 @@
 #include "AssetLibrary.h"
 
 namespace ogs {
-	
+
 class WindowProps
 {
 public:
-	constexpr WindowProps(int width, int height)
-		:_height(height), _width(width), _aspect(width / static_cast<float>(height))
+	constexpr WindowProps( int width, int height )
+		:_height( height ), _width( width ), _aspect( width / static_cast<float>(height) )
 	{};
 
 	constexpr auto GetWidth()  const { return _width; };
@@ -29,7 +29,7 @@ constexpr static WindowProps DefaultWindowProp = { 600, 400 };
 
 class GLContext {
 public:
-	
+
 	struct WindowUserData
 	{
 		Input* input = nullptr;
@@ -39,14 +39,14 @@ public:
 
 public:
 	GLContext() = default;
-	void Construct(WindowProps window_props);
+	void Construct( WindowProps window_props );
 	virtual ~GLContext();
 
 	void Run();
 
 	inline auto GetViewport()
 	{
-		return glm::vec2(_window_props.GetWidth(), _window_props.GetHeight());
+		return glm::vec2( _window_props.GetWidth(), _window_props.GetHeight() );
 	}
 
 	float GetTime();
@@ -58,11 +58,11 @@ public:
 
 protected:
 	virtual void OnConstruct() {};
-	virtual void OnUpdate(float) {};
+	virtual void OnUpdate( float ) {};
 
-	inline auto GetKey(int glfw_key)
+	inline auto GetKey( int glfw_key )
 	{
-		return _input.GetKey(glfw_key);
+		return _input.GetKey( glfw_key );
 	}
 
 protected:

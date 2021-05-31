@@ -25,4 +25,4 @@ struct Wavefront_File
 	std::vector<Wavefront_Triangle> triangles;
 };
 
-std::unique_ptr<Wavefront_File> wavefront_load(std::string const& path);
+std::unique_ptr<Wavefront_File> wavefront_load( std::string const& path );

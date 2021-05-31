@@ -18,26 +18,26 @@ class VertexArray {
 
 public:
 	VertexArray() = default;
-	VertexArray(std::vector<float> const& vertex_data,
-				std::vector<int>   const& index_data,
-				VertexBufferLayout const& layout);
+	VertexArray( std::vector<float> const& vertex_data,
+		std::vector<int>   const& index_data,
+		VertexBufferLayout const& layout );
 
-	VertexArray(std::vector<Vertex> const& vertex_data,
-		VertexBufferLayout const& layout);
+	VertexArray( std::vector<Vertex> const& vertex_data,
+		VertexBufferLayout const& layout );
 
 
-	VertexArray(VertexArray const&) = delete;
-	VertexArray& operator=(VertexArray const&) = delete;
+	VertexArray( VertexArray const& ) = delete;
+	VertexArray& operator=( VertexArray const& ) = delete;
 
-	VertexArray(VertexArray&& vao) noexcept
+	VertexArray( VertexArray&& vao ) noexcept
 	{
-		std::swap(_id, vao._id);
+		std::swap( _id, vao._id );
 		_count = vao._count;
 	}
 
-	VertexArray& operator=(VertexArray&& rhs) noexcept
+	VertexArray& operator=( VertexArray&& rhs ) noexcept
 	{
-		std::swap(_id, rhs._id);
+		std::swap( _id, rhs._id );
 		_count = rhs._count;
 		return *this;
 	}

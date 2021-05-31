@@ -16,7 +16,7 @@
 namespace ogs
 {
 class AssetLibrary {
-	using MeshLoadedCallback = std::function<void(Mesh*)>;
+	using MeshLoadedCallback = std::function<void( Mesh* )>;
 	friend class GLContext;
 
 	struct MeshLoadTask
@@ -27,10 +27,10 @@ class AssetLibrary {
 	};
 
 public:
-	Texture* GetTexture(std::string const& path);
-	Mesh* GetMesh(std::string const& path);
+	Texture* GetTexture( std::string const& path );
+	Mesh* GetMesh( std::string const& path );
 
-	void GetMeshAsync(std::string const& path, MeshLoadedCallback&& on_loaded);
+	void GetMeshAsync( std::string const& path, MeshLoadedCallback&& on_loaded );
 
 private:
 	AssetLibrary() = default;

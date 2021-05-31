@@ -11,8 +11,8 @@ class Material
 {
 public:
 	Material();
-	Material(Texture const* diffuse, Texture const* specular);
-	void Bind(ogs::Shader const& shader) const;
+	Material( Texture const* diffuse, Texture const* specular );
+	void Bind( ogs::Shader const& shader ) const;
 
 
 private:

@@ -12,7 +12,7 @@
 #include "backends/imgui_impl_opengl3.h"
 
 
-void ogs::GLContext::Construct(WindowProps window_props)
+void ogs::GLContext::Construct( WindowProps window_props )
 {
 	_window_props = window_props;
 	_camera = { window_props.GetAspect(), 90.0F };
@@ -22,138 +22,138 @@ void ogs::GLContext::Construct(WindowProps window_props)
 	_data.camera = &_camera;
 
 	glfwInit();
-	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint( GLFW_SAMPLES, 4 );
 
-	_window = glfwCreateWindow(window_props.GetWidth(), window_props.GetHeight(), "ogs", nullptr, nullptr);
+	_window = glfwCreateWindow( window_props.GetWidth(), window_props.GetHeight(), "ogs", nullptr, nullptr );
 
-	if (!_window)
+	if ( !_window )
 	{
 		glfwTerminate();
-		LogError("GLFW : Create Window Error");
-		std::exit(-1);
+		LogError( "GLFW : Create Window Error" );
+		std::exit( -1 );
 	}
 
-	glfwMakeContextCurrent(_window);
-	glfwSetWindowUserPointer(_window, &_data);
+	glfwMakeContextCurrent( _window );
+	glfwSetWindowUserPointer( _window, &_data );
 
-	glfwSwapInterval(1);
+	glfwSwapInterval( 1 );
 
-	glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	glfwSetInputMode( _window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
 
-	if (glfwRawMouseMotionSupported())
+	if ( glfwRawMouseMotionSupported() )
 	{
-		LogHint("Raw input enabled");
-		glfwSetInputMode(_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+		LogHint( "Raw input enabled" );
+		glfwSetInputMode( _window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE );
 	}
 
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	if ( !gladLoadGLLoader( (GLADloadproc)glfwGetProcAddress ) )
 	{
-		LogError("GLAD : Failed to initialize GLAD");
-		std::exit(-1);
+		LogError( "GLAD : Failed to initialize GLAD" );
+		std::exit( -1 );
 	}
 
-	glEnable(GL_DEPTH_TEST);
+	glEnable( GL_DEPTH_TEST );
 	initialized = true;
-	
-	// Setup callback funcs
-	{ 
 
-		auto ResizeCallback = [](GLFWwindow* window, int xsize, int ysize)
+	// Setup callback funcs
+	{
+
+		auto ResizeCallback = []( GLFWwindow* window, int xsize, int ysize )
 		{
-			auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer(window));
-			assert(user_data && "Window User Pointer should not be null!");
+			auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer( window ));
+			assert( user_data && "Window User Pointer should not be null!" );
 			*user_data->window_props = { xsize, ysize };
-			user_data->camera->SetAspectRatio(user_data->window_props->GetAspect());
-			glViewport(0, 0, xsize, ysize);
+			user_data->camera->SetAspectRatio( user_data->window_props->GetAspect() );
+			glViewport( 0, 0, xsize, ysize );
 		};
 
-		glfwSetWindowSizeCallback(_window, ResizeCallback);
+		glfwSetWindowSizeCallback( _window, ResizeCallback );
 
-		auto KeypressCallback = [](GLFWwindow* window, int key, int, int action, int mods)
+		auto KeypressCallback = []( GLFWwindow* window, int key, int, int action, int mods )
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			if (io.WantCaptureKeyboard)
+			if ( io.WantCaptureKeyboard )
 				return;
-			auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer(window));
-			assert(user_data && "Window User Pointer should not be null!");
+			auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer( window ));
+			assert( user_data && "Window User Pointer should not be null!" );
 
-			user_data->input->KeyEvent(key, action);
+			user_data->input->KeyEvent( key, action );
 
-			if (action != GLFW_PRESS)
+			if ( action != GLFW_PRESS )
 			{
 				return;
 			}
 
-			if (key == GLFW_KEY_ESCAPE)
+			if ( key == GLFW_KEY_ESCAPE )
 			{
-				glfwSetWindowShouldClose(window, true);
+				glfwSetWindowShouldClose( window, true );
 				return;
 			}
 
-			if (key == GLFW_KEY_ENTER &&
-				(mods & GLFW_MOD_ALT))
+			if ( key == GLFW_KEY_ENTER &&
+				(mods & GLFW_MOD_ALT) )
 			{
-				auto const maximized = glfwGetWindowAttrib(window, GLFW_MAXIMIZED);
+				auto const maximized = glfwGetWindowAttrib( window, GLFW_MAXIMIZED );
 
-				if (maximized == GLFW_TRUE)
+				if ( maximized == GLFW_TRUE )
 				{
-					glfwRestoreWindow(window);
+					glfwRestoreWindow( window );
 					return;
 				}
 				else
 				{
-					glfwMaximizeWindow(window);
+					glfwMaximizeWindow( window );
 					return;
 				}
 			}
 		};
 
-		glfwSetKeyCallback(_window, KeypressCallback);
+		glfwSetKeyCallback( _window, KeypressCallback );
 
-		auto MouseButtonCallback = [](GLFWwindow* window, int button, int action, int)
+		auto MouseButtonCallback = []( GLFWwindow* window, int button, int action, int )
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			if (io.WantCaptureMouse)
+			if ( io.WantCaptureMouse )
 				return;
-			auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer(window));
-			assert(user_data && "Window User Pointer should not be null!");
-			user_data->input->MouseEvent(button, action);
+			auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer( window ));
+			assert( user_data && "Window User Pointer should not be null!" );
+			user_data->input->MouseEvent( button, action );
 
-			if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+			if ( button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS )
 			{
-				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+				glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
 			}
-			else if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+			else if ( button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE )
 			{
-				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+				glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
 			}
 		};
 
-		glfwSetMouseButtonCallback(_window, MouseButtonCallback);
+		glfwSetMouseButtonCallback( _window, MouseButtonCallback );
 
-		auto ScrollCallback = [](GLFWwindow* window, double, double yoffset)
+		auto ScrollCallback = []( GLFWwindow* window, double, double yoffset )
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			if (io.WantCaptureMouse)
+			if ( io.WantCaptureMouse )
 				return;
-			auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer(window));
-			assert(user_data && "Window User Pointer should not be null!");
+			auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer( window ));
+			assert( user_data && "Window User Pointer should not be null!" );
 
-			user_data->camera->Zoom(static_cast<float>(yoffset));
+			user_data->camera->Zoom( static_cast<float>(yoffset) );
 		};
 
-		glfwSetScrollCallback(_window, ScrollCallback);
+		glfwSetScrollCallback( _window, ScrollCallback );
 
-		auto MouseMoveCallback = [](GLFWwindow* window, double xpos, double ypos)
+		auto MouseMoveCallback = []( GLFWwindow* window, double xpos, double ypos )
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			if (io.WantCaptureMouse)
+			if ( io.WantCaptureMouse )
 				return;
-			auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer(window));
-			user_data->input->MouseMove(static_cast<float>(xpos), static_cast<float>(ypos));
+			auto user_data = static_cast<WindowUserData*> (glfwGetWindowUserPointer( window ));
+			user_data->input->MouseMove( static_cast<float>(xpos), static_cast<float>(ypos) );
 		};
 
-		glfwSetCursorPosCallback(_window, MouseMoveCallback);
+		glfwSetCursorPosCallback( _window, MouseMoveCallback );
 
 	} // Setup callback funcs
 
@@ -166,40 +166,40 @@ void ogs::GLContext::Construct(WindowProps window_props)
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-	
+
 	ImGui::StyleColorsDark();
-	
+
 	auto screen_dpi_scale = [window = _window]()
 	{
 		float xscale, yscale;
 		int monitor_count;
-		auto monitors = glfwGetMonitors(&monitor_count);
-		glfwGetMonitorContentScale(monitors[0], &xscale, &yscale);
+		auto monitors = glfwGetMonitors( &monitor_count );
+		glfwGetMonitorContentScale( monitors[0], &xscale, &yscale );
 		return xscale;
 	}();
 
 
 	ImGuiStyle& style = ImGui::GetStyle();
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	if ( io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable )
 	{
 		style.WindowRounding = 4.0f * screen_dpi_scale;
 		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-		style.ScaleAllSizes(screen_dpi_scale);
-		io.Fonts->AddFontFromFileTTF("res/fonts/Verdana.ttf", 18.0f * screen_dpi_scale, nullptr, nullptr);
+		style.ScaleAllSizes( screen_dpi_scale );
+		io.Fonts->AddFontFromFileTTF( "res/fonts/Verdana.ttf", 18.0f * screen_dpi_scale, nullptr, nullptr );
 	}
 
-	ImGui_ImplGlfw_InitForOpenGL(_window, true);
-	ImGui_ImplOpenGL3_Init("#version 410");
+	ImGui_ImplGlfw_InitForOpenGL( _window, true );
+	ImGui_ImplOpenGL3_Init( "#version 410" );
 
-	_default_shader = std::make_unique<Shader>("res/shaders/default.vert", "res/shaders/default.frag");
-	Renderer::UseShader(*_default_shader);
+	_default_shader = std::make_unique<Shader>( "res/shaders/default.vert", "res/shaders/default.frag" );
+	Renderer::UseShader( *_default_shader );
 
 	OnConstruct();
 }
 
 ogs::GLContext::~GLContext()
 {
-	if (initialized)
+	if ( initialized )
 	{
 		glfwTerminate();
 	}
@@ -213,90 +213,90 @@ void ogs::GLContext::Run()
 		return delta_time;
 	};
 
-	_camera.SetPosition(glm::vec3(0.0F, 0.0F, 5.0F));
+	_camera.SetPosition( glm::vec3( 0.0F, 0.0F, 5.0F ) );
 
-	while (!glfwWindowShouldClose(_window))
+	while ( !glfwWindowShouldClose( _window ) )
 	{
-		glClearColor(0.1F, 0.1F, 0.1F, 1.0F);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor( 0.1F, 0.1F, 0.1F, 1.0F );
+		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 		auto const dt = UpdateTime();
-		
+
 		// Camera Movement
-		if (glfwGetInputMode(_window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
+		if ( glfwGetInputMode( _window, GLFW_CURSOR ) == GLFW_CURSOR_DISABLED )
 		{
 			auto const mouse_move_delta = _input.GetMouseDelta();
-			if (mouse_move_delta.length() > 0.01F)
+			if ( mouse_move_delta.length() > 0.01F )
 			{
-				_camera.Rotate(mouse_move_delta * _mouse_sensitivity);
+				_camera.Rotate( mouse_move_delta * _mouse_sensitivity );
 			}
-			auto camera_movement = glm::vec3(0.0F);
-			if (GetKey(GLFW_KEY_W).held)
+			auto camera_movement = glm::vec3( 0.0F );
+			if ( GetKey( GLFW_KEY_W ).held )
 			{
 				camera_movement.z = 1.0F;
 			}
 
-			if (GetKey(GLFW_KEY_S).held)
+			if ( GetKey( GLFW_KEY_S ).held )
 			{
 				camera_movement.z = -1.0F;
 			}
-			if (GetKey(GLFW_KEY_A).held)
+			if ( GetKey( GLFW_KEY_A ).held )
 			{
 				camera_movement.x = 1.0F;
 			}
 
-			if (GetKey(GLFW_KEY_D).held)
+			if ( GetKey( GLFW_KEY_D ).held )
 			{
 				camera_movement.x = -1.0F;
 			}
 
-			if (GetKey(GLFW_KEY_Q).held)
+			if ( GetKey( GLFW_KEY_Q ).held )
 			{
 				camera_movement.y = 1.0F;
 			}
 
-			if (GetKey(GLFW_KEY_Z).held)
+			if ( GetKey( GLFW_KEY_Z ).held )
 			{
 				camera_movement.y = -1.0F;
 			}
 
-			if (camera_movement.length() > 0.01F)
+			if ( camera_movement.length() > 0.01F )
 			{
-				if(GetKey(GLFW_KEY_LEFT_SHIFT).held)
-					_camera.Move(camera_movement * 25.0F * dt);
+				if ( GetKey( GLFW_KEY_LEFT_SHIFT ).held )
+					_camera.Move( camera_movement * 25.0F * dt );
 				else
-					_camera.Move(camera_movement * 5.0F * dt);
+					_camera.Move( camera_movement * 5.0F * dt );
 
 			}
 		}
-		
+
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
 		// User Update Loop
-		Renderer::BeginScene(_camera);
-		OnUpdate(dt);
-		
+		Renderer::BeginScene( _camera );
+		OnUpdate( dt );
+
 
 		ImGuiIO& io = ImGui::GetIO();
-		io.DisplaySize = ImVec2(GetViewport().x, GetViewport().y);
+		io.DisplaySize = ImVec2( GetViewport().x, GetViewport().y );
 
 		// Rendering
 		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		
-		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
+
+		if ( io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable )
 		{
 			GLFWwindow* backup_current_context = glfwGetCurrentContext();
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
-			glfwMakeContextCurrent(backup_current_context);
+			glfwMakeContextCurrent( backup_current_context );
 		}
 		assets.Maintain();
 		_input.Update();
 		glfwPollEvents();
-		glfwSwapBuffers(_window);
+		glfwSwapBuffers( _window );
 	}
 }
 

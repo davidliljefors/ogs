@@ -8,18 +8,18 @@ ogs::Material::Material()
 	_specular = ogs::Texture::GetWhiteTexture();
 }
 
-ogs::Material::Material(Texture const* diffuse, Texture const* specular)
+ogs::Material::Material( Texture const* diffuse, Texture const* specular )
 {
 	_diffuse = diffuse;
 	_specular = specular;
 }
 
-void ogs::Material::Bind(ogs::Shader const& shader) const
+void ogs::Material::Bind( ogs::Shader const& shader ) const
 {
-	shader.SetFloat("u_Material.shininess", _shininess);
-	_diffuse->Bind(0);
-	shader.SetInt("u_Material.diffuse", 0);
-	_specular->Bind(1);
-	shader.SetInt("u_Material.specular", 1);
+	shader.SetFloat( "u_Material.shininess", _shininess );
+	_diffuse->Bind( 0 );
+	shader.SetInt( "u_Material.diffuse", 0 );
+	_specular->Bind( 1 );
+	shader.SetInt( "u_Material.specular", 1 );
 
 }

@@ -8,17 +8,17 @@ namespace ogs {
 
 class Camera {
 public:
-	Camera(float aspect_ratio, float fov_y);
+	Camera( float aspect_ratio, float fov_y );
 
-	void Rotate(glm::vec2 mouse_delta);
+	void Rotate( glm::vec2 mouse_delta );
 
-	void Zoom(float delta);
+	void Zoom( float delta );
 
-	void Move(glm::vec3 local_move);
+	void Move( glm::vec3 local_move );
 
-	void SetAspectRatio(float aspect_ratio);
+	void SetAspectRatio( float aspect_ratio );
 
-	void SetPosition(glm::vec3 const& position);
+	void SetPosition( glm::vec3 const& position );
 
 	glm::mat4 const& GetVP() const;
 

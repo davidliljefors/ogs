@@ -14,7 +14,7 @@ public:
 	GuardedRef( GuardedRef const& ) = delete;
 	GuardedRef( GuardedRef&& ) = default;
 
- 	GuardedRef( T& t, std::unique_lock<Mutex> lock )
+	GuardedRef( T& t, std::unique_lock<Mutex> lock )
 		: lock( std::move( lock ) ), rw( std::ref( t ) )
 	{}
 
