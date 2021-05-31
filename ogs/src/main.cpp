@@ -18,12 +18,12 @@ struct Object
 struct Light
 {
 	ogs::Transform transform;
-	glm::vec3 ambient  = glm::vec3(0.03F);
+	glm::vec3 ambient  = glm::vec3(0.3F);
 	glm::vec3 diffuse  = glm::vec3(1.0F);
 	glm::vec3 specular = glm::vec3(0.5F);
 
 	ogs::Mesh* mesh = nullptr;
-	ogs::Material material{};
+	ogs::Material material;
 };
 
 class Game : public ogs::GLContext

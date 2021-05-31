@@ -66,28 +66,30 @@ void ogs::AssetLibrary::Maintain()
 {
 	while (!_finished_tasks.empty())
 	{
-		auto& loaded = _finished_tasks.front();
-
-		auto task = std::ranges::find_if(_mesh_queue, 
-			[&loaded = loaded] (MeshLoadTask& task) 
-			{ return task.Name == loaded; }
-		);
-
-		auto obj_file = task->File.get();
-		if (!obj_file)
 		{
-			LogError("Object file was invalid after finishing load");
-			return;
-		}
+			auto loaded = _finished_tasks.front();
 
-		_loaded_meshes.emplace(task->Name, std::make_unique<Mesh>(*obj_file));
-		for (auto&& callback : task->OnLoaded)
-		{
-			callback(_loaded_meshes[task->Name].get());
-		}
+			auto task = std::ranges::find_if(_mesh_queue, 
+				[&loaded = loaded.get()] (MeshLoadTask& task) 
+				{ return task.Name == loaded; }
+			);
 
-		_currently_loading.erase(task->Name);
-		_mesh_queue.erase(task);
+			auto obj_file = task->File.get();
+			if (!obj_file)
+			{
+				LogError("Object file was invalid after finishing load");
+				return;
+			}
+
+			_loaded_meshes.emplace(task->Name, std::make_unique<Mesh>(*obj_file));
+			for (auto&& callback : task->OnLoaded)
+			{
+				callback(_loaded_meshes[task->Name].get());
+			}
+
+			_currently_loading.erase(task->Name);
+			_mesh_queue.erase(task);
+		}
 		_finished_tasks.pop_front();
 	}
 }
