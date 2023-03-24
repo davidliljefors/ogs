@@ -1,66 +1,67 @@
 #include "ogspch.h"
+
 #include "Input.h"
 
 void ogs::Input::Update()
 {
-	_mouse_delta = glm::vec2( 0.0F );
+	m_mouseDelta = glm::vec2(0.0F);
 
-	for ( auto& key_sate : _keys )
+	for (auto& key_sate : m_keys)
 	{
-		key_sate.pressed = false;
-		key_sate.released = false;
+		key_sate.bPressed = false;
+		key_sate.bReleased = false;
 	}
 
-	for ( auto& mouse_state : _mouse_buttons )
+	for (auto& mouse_state : m_mouseButtons)
 	{
-		mouse_state.pressed = false;
-		mouse_state.released = false;
-	}
-}
-
-void ogs::Input::MouseMove( float x, float y )
-{
-	auto const mouse_pos = glm::vec2( x, y );
-	if ( _first_mouse )
-	{
-		_last_mouse_pos = mouse_pos;
-		_first_mouse = false;
-	}
-
-	_mouse_delta += (mouse_pos - _last_mouse_pos);
-	_last_mouse_pos = mouse_pos;
-}
-
-void ogs::Input::KeyEvent( int key, int action )
-{
-	if ( action == GLFW_PRESS )
-	{
-		_keys[key].pressed = true;
-		_keys[key].held = true;
-		return;
-	}
-
-	if ( action == GLFW_RELEASE )
-	{
-		_keys[key].held = false;
-		_keys[key].released = true;
-		return;
+		mouse_state.bPressed = false;
+		mouse_state.bReleased = false;
 	}
 }
 
-void ogs::Input::MouseEvent( int button, int action )
+void ogs::Input::MouseMove(float x, float y)
 {
-	if ( action == GLFW_PRESS )
+	auto const mouse_pos = glm::vec2(x, y);
+	if (m_bFirstMouse)
 	{
-		_mouse_buttons[button].pressed = true;
-		_mouse_buttons[button].held = true;
+		m_lastMousePos = mouse_pos;
+		m_bFirstMouse = false;
+	}
+
+	m_mouseDelta += (mouse_pos - m_lastMousePos);
+	m_lastMousePos = mouse_pos;
+}
+
+void ogs::Input::KeyEvent(int key, int action)
+{
+	if (action == GLFW_PRESS)
+	{
+		m_keys[key].bPressed = true;
+		m_keys[key].bHeld = true;
 		return;
 	}
 
-	if ( action == GLFW_RELEASE )
+	if (action == GLFW_RELEASE)
 	{
-		_mouse_buttons[button].held = false;
-		_mouse_buttons[button].released = true;
+		m_keys[key].bHeld = false;
+		m_keys[key].bReleased = true;
+		return;
+	}
+}
+
+void ogs::Input::MouseEvent(int button, int action)
+{
+	if (action == GLFW_PRESS)
+	{
+		m_mouseButtons[button].bPressed = true;
+		m_mouseButtons[button].bHeld = true;
+		return;
+	}
+
+	if (action == GLFW_RELEASE)
+	{
+		m_mouseButtons[button].bHeld = false;
+		m_mouseButtons[button].bReleased = true;
 		return;
 	}
 }

@@ -1,61 +1,65 @@
 #pragma once
 #include <vector>
-#include <glm/glm.hpp>
 
 #include "Core.h"
+#include "CoreTypes.h"
 #include "VertexBufferLayout.h"
 
-namespace ogs {
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 
-struct Vertex
+namespace ogs
 {
-	glm::vec3 Position{};
-	glm::vec2 TexCoord{};
-	glm::vec3 Normal{};
-};
 
-class VertexArray {
-
-public:
-	VertexArray() = default;
-	VertexArray( std::vector<float> const& vertex_data,
-		std::vector<int>   const& index_data,
-		VertexBufferLayout const& layout );
-
-	VertexArray( std::vector<Vertex> const& vertex_data,
-		VertexBufferLayout const& layout );
-
-
-	VertexArray( VertexArray const& ) = delete;
-	VertexArray& operator=( VertexArray const& ) = delete;
-
-	VertexArray( VertexArray&& vao ) noexcept
+	struct Vertex
 	{
-		std::swap( _id, vao._id );
-		_count = vao._count;
-	}
+		glm::vec3 Position{};
+		glm::vec2 TexCoord{};
+		glm::vec3 Normal{};
+	};
 
-	VertexArray& operator=( VertexArray&& rhs ) noexcept
+	class VertexArray
 	{
-		std::swap( _id, rhs._id );
-		_count = rhs._count;
-		return *this;
-	}
 
-	~VertexArray();
+	public:
+		VertexArray() = default;
+		VertexArray(std::vector<f32> const &vertex_data,
+					std::vector<i32> const &index_data,
+					VertexBufferLayout const &layout);
 
-	auto Count() const
-	{
-		return _count;
-	}
+		VertexArray(std::vector<Vertex> const &vertex_data,
+					VertexBufferLayout const &layout);
 
-	void Bind() const;
+		VertexArray(VertexArray const &) = delete;
+		VertexArray &operator=(VertexArray const &) = delete;
 
-	auto IsIndexed() const { return _using_index_buffer; }
+		VertexArray(VertexArray &&vao) noexcept
+		{
+			std::swap(m_id, vao.m_id);
+			m_count = vao.m_count;
+		}
 
-private:
-	bool _using_index_buffer = false;
-	unsigned int _id = 0;
-	unsigned int _count = 0;
-};
+		VertexArray &operator=(VertexArray &&rhs) noexcept
+		{
+			std::swap(m_id, rhs.m_id);
+			m_count = rhs.m_count;
+			return *this;
+		}
+
+		~VertexArray();
+
+		auto Count() const
+		{
+			return m_count;
+		}
+
+		void Bind() const;
+
+		auto IsIndexed() const { return _using_index_buffer; }
+
+	private:
+		bool _using_index_buffer = false;
+		u32 m_id = 0;
+		u32 m_count = 0;
+	};
 }

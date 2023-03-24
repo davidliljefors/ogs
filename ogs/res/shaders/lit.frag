@@ -52,7 +52,7 @@ void main()
     
     float dist = length(f_World - u_Light.position);
 
-    vec3 result = attenuation(dist, 1.0, 0.12, 0.22) * (ambient +diffuse + specular);
+    vec3 result = attenuation(dist, 0.5, 0.001, 0.00) * (ambient +diffuse + specular);
     
     // Final color
     FragColor = vec4(result, 1.0);

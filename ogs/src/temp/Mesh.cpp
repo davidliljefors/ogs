@@ -1,7 +1,7 @@
 #include "ogspch.h"
 #include "Mesh.h"
 
-ogs::Mesh::Mesh( Wavefront_File const& obj )
+ogs::MeshResource::MeshResource( Wavefront_File const& obj )
 {
 	_vertices.reserve( obj.triangles.size() * 3 );
 

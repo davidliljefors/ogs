@@ -1,35 +1,35 @@
 #pragma once
 #include <glm/glm.hpp>
 
-#include "Input.h"
-#include "Camera.h"
-#include "Shader.h"
 #include "AssetLibrary.h"
+#include "Camera.h"
+#include "Input.h"
+#include "Shader.h"
 
 namespace ogs {
 
 class WindowProps
 {
 public:
-	constexpr WindowProps( int width, int height )
-		:_height( height ), _width( width ), _aspect( width / static_cast<float>(height) )
+	constexpr WindowProps(int width, int height)
+		: m_height(height), m_width(width), m_aspect(width / static_cast<float>(height))
 	{};
 
-	constexpr auto GetWidth()  const { return _width; };
-	constexpr auto GetHeight() const { return _height; };
-	constexpr auto GetAspect() const { return _aspect; };
+	constexpr auto GetWidth() const { return m_width; };
+	constexpr auto GetHeight() const { return m_height; };
+	constexpr auto GetAspect() const { return m_aspect; };
 
 private:
-	int _width;
-	int _height;
-	float _aspect;
+	int m_width;
+	int m_height;
+	float m_aspect;
 };
 
 constexpr static WindowProps DefaultWindowProp = { 600, 400 };
 
-class GLContext {
+class GLContext
+{
 public:
-
 	struct WindowUserData
 	{
 		Input* input = nullptr;
@@ -39,44 +39,45 @@ public:
 
 public:
 	GLContext() = default;
-	void Construct( WindowProps window_props );
+	void Construct(WindowProps window_props);
 	virtual ~GLContext();
 
 	void Run();
 
 	inline auto GetViewport()
 	{
-		return glm::vec2( _window_props.GetWidth(), _window_props.GetHeight() );
+		return glm::vec2(m_windowProps.GetWidth(), m_windowProps.GetHeight());
 	}
 
 	float GetTime();
 
 	inline auto GetAspect()
 	{
-		return _window_props.GetAspect();
+		return m_windowProps.GetAspect();
 	}
 
 protected:
 	virtual void OnConstruct() {};
-	virtual void OnUpdate( float ) {};
+	virtual void OnUpdate(float) {};
 
-	inline auto GetKey( int glfw_key )
+	inline auto GetKey(int glfw_key)
 	{
-		return _input.GetKey( glfw_key );
+		return m_input.GetKey(glfw_key);
 	}
 
 protected:
-	GLFWwindow* _window = nullptr;
-	WindowUserData _data{};
-	Input _input{};
-	WindowProps _window_props = DefaultWindowProp;
-	Camera _camera = { DefaultWindowProp.GetAspect(), 90.0F };
-	float _mouse_sensitivity = 0.07F;
+	GLFWwindow* m_pWindow = nullptr;
+	WindowUserData m_windowUserData{};
+	Input m_input{};
+	WindowProps m_windowProps = DefaultWindowProp;
+	Camera m_camera = { DefaultWindowProp.GetAspect(), 90.0F };
+	float m_mouseSensitivity = 0.07F;
 
 	AssetLibrary assets;
 
 private:
-	std::unique_ptr<Shader> _default_shader;
-	bool initialized = false;
+	std::unique_ptr<Shader> m_pShader;
+	bool m_bInitialized = false;
 };
+
 }

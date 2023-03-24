@@ -8,17 +8,17 @@ namespace ogs {
 struct Transform
 {
 	Transform() = default;
-	Transform( glm::vec3 const& position ) : _position( position ) {};
+	Transform( glm::vec3 const& position ) : m_pos( position ) {};
 
-	void Invalidate() { _dirty = true; }
+	void Invalidate() { m_revision = true; }
 
 	auto const& Mat4() const
 	{
-		if ( _dirty )
+		if ( m_revision )
 		{
-			_dirty = false;
+			m_revision = false;
 			_matrix = glm::mat4( 1.0F );
-			_matrix = glm::translate( _matrix, _position );
+			_matrix = glm::translate( _matrix, m_pos );
 			_matrix = glm::rotate( _matrix, glm::radians( _rotation.x ), glm::vec3( 1.0F, 0.0F, 0.0F ) );
 			_matrix = glm::rotate( _matrix, glm::radians( _rotation.y ), glm::vec3( 0.0F, 1.0F, 0.0F ) );
 			_matrix = glm::rotate( _matrix, glm::radians( _rotation.z ), glm::vec3( 0.0F, 0.0F, 1.0F ) );
@@ -31,7 +31,7 @@ struct Transform
 	inline void SetPosition( glm::vec3 const& position )
 	{
 		Invalidate();
-		_position = position;
+		m_pos = position;
 	}
 
 	inline void SetRotation( glm::vec3 const& rotation )
@@ -48,7 +48,7 @@ struct Transform
 
 	inline glm::vec3 const& GetPosition()
 	{
-		return _position;
+		return m_pos;
 	}
 
 	inline glm::vec3 const& GetRotation()
@@ -64,7 +64,7 @@ struct Transform
 	//Must call invalidate, for imgui
 	inline float* PosPtr()
 	{
-		return glm::value_ptr( _position );
+		return glm::value_ptr( m_pos );
 	}
 
 	inline float* RotPtr()
@@ -79,10 +79,10 @@ struct Transform
 
 
 private:
-	glm::vec3 _position{ 0.0F };
+	glm::vec3 m_pos{ 0.0F };
 	glm::vec3 _rotation{ 0.0F };
 	glm::vec3 _scale{ 1.0F };
-	mutable bool _dirty = true;
+	mutable bool m_revision = true;
 	mutable glm::mat4 _matrix{ 1.0F };
 };
 

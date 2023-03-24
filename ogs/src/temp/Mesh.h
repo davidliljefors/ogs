@@ -6,11 +6,12 @@
 
 namespace ogs {
 
-class Mesh {
+class Mesh
+{
 	friend class Renderer;
 
 public:
-	Mesh( Wavefront_File const& obj );
+	Mesh(Wavefront_File const& obj);
 
 private:
 	std::vector<Vertex> _vertices;
